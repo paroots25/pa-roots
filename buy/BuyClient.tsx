@@ -1,0 +1,244 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
+export default function BuyPage() {
+  const router = useRouter();
+  const params = useSearchParams();
+
+  const plantType = params.get("type");
+
+ const plantPrices: Record<string, { name: string; price: number }> = {
+    "peace-lily": { name: "Peace Lily", price: 349 },
+    "snake-plant": { name: "Snake Plant", price: 299 },
+    "areca-palm": { name: "Areca Palm", price: 399 },
+    birkin: { name: "Philodendron Birkin", price: 499 },
+    "white-princess": { name: "Philodendron White Princess", price: 549 },
+    "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 349 },
+    "peperomia-silver": { name: "Peperomia Silver Ripple", price: 349 },
+    "christmas-cactus": { name: "Christmas Cactus", price: 299 },
+    "adenium-green": { name: "Adenium Green", price: 399 },
+    "ZZZ": { name: "Zamioculcas(ZZ)", price: 399 },
+    "Imperial-Green": { name: "Imperial Green", price: 399 },
+    "Aglaonema-Thai": { name: "Aglaonema Thai", price: 399 },
+    "Aglaonema-Lipstick": { name: "Aglaonema Lipstick", price: 399 },
+    "Succulent": { name: "Succulent", price: 399 },
+    "Calathea": { name: "Calathea", price: 399 },
+    "Syngonium": { name: "Syngonium", price: 399 },
+    "Cactus": { name: "Cactus", price: 399 },
+    "Cana": { name: "Cana", price: 399 },
+    "Aptenia-Variegated": { name: "Aptenia Variegated", price: 399 },
+    "zz": { name: "Zamioculcas(ZZ) Premium", price: 399 },
+    "Heliconia-Fire": { name: "Heliconia Fire", price: 399 },
+
+    rose: { name: "Rose", price: 249 },
+
+    "Red gerbera": { name: "Red Gerbera", price: 199 },
+    "Pink gerbera": { name: "Pink Gerbera", price: 199 },
+    "Yellow gerbera": { name: "Yellow Gerbera", price: 199 },
+    "White gerbera": { name: "White Gerbera", price: 199 },
+    "Orange gerbera": { name: "Orange Gerbera", price: 199 },
+
+    lavender: { name: "Lavender", price: 299 },
+    portulaca: { name: "Portulaca Moss Rose", price: 199 },
+    crossandra: { name: "Crossandra", price: 199 },
+    azalea: { name: "Azalea", price: 299 },
+    jasmine: { name: "Arabian Jasmine", price: 249 },
+    gardenia: { name: "Gardenia", price: 299 },
+    "yellow kalanchoe": { name: "Yellow Kalanchoe", price: 249 },
+    "pink kalanchoe": { name: "Pink Kalanchoe", price: 249 },
+    bougainvillea: { name: "Bougainvillea", price: 349 },
+
+    bonsai: { name: "Bonsai Tree", price: 599 },
+    orchid: { name: "Dendrobium Orchid", price: 699 },
+    bird: { name: "Bird of Paradise", price: 799 },
+    adenium: { name: "Desert Rose (Adenium)", price: 599 },
+    "orange-philo": { name: "Philodendron Prince of Orange", price: 549 },
+     };
+
+  const selectedPlant = plantType ? plantPrices[plantType] : null;
+
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!name || !message || !email || !selectedPlant) {
+      alert("Please fill all fields and select a plant");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // 1️⃣ Create plant in DB
+      const plantRes = await fetch("/api/create-plant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          message,
+          email,
+          plant_type: plantType,
+        }),
+      });
+
+      const plantData = await plantRes.json();
+
+      if (!plantRes.ok) throw new Error("Plant creation failed");
+
+      const plantId = plantData.plant.id;
+
+      // 2️⃣ Create Razorpay order with correct amount
+      const orderRes = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: selectedPlant.price }),
+      });
+
+      const order = await orderRes.json();
+
+      if (!orderRes.ok) throw new Error("Order creation failed");
+
+      // 3️⃣ Load Razorpay
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+
+      script.onload = () => {
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: order.amount,
+          currency: order.currency,
+          name: "PA Roots",
+          description: `Advance for ${selectedPlant.name}`,
+          order_id: order.id,
+
+          handler: async function (response: any) {
+            const verifyRes = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                plantId,
+              }),
+            });
+
+            if (!verifyRes.ok) {
+              alert("Payment verification failed ❌");
+              return;
+            }
+
+            router.push(`/result/${plantId}`);
+          },
+
+          prefill: { email },
+          theme: { color: "#166534" },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      };
+
+      document.body.appendChild(script);
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong ❌");
+    }
+
+    setLoading(false);
+  }
+
+  return (
+    <div style={page}>
+      <form onSubmit={handleSubmit} style={form}>
+        <h1 style={title}>Buy Your Memory Plant 🌱</h1>
+
+        {selectedPlant && (
+          <p style={selectedPlantText}>
+            {selectedPlant.name} — ₹{selectedPlant.price}
+          </p>
+        )}
+
+        <input
+          placeholder="Plant name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          style={input}
+        />
+
+        <textarea
+          placeholder="Memory message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          required
+          style={{ ...input, minHeight: 90 }}
+        />
+
+        <input
+          type="email"
+          placeholder="Your email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={input}
+        />
+
+        <button type="submit" disabled={loading} style={button}>
+          {loading ? "Processing..." : "Pay & Create Plant"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+/* styles */
+const page = {
+  minHeight: "100vh",
+  background: "#ecfdf5",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const form = {
+  background: "white",
+  padding: 30,
+  borderRadius: 16,
+  width: 360,
+  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+};
+
+const title = { color: "#166534", marginBottom: 20 };
+
+const selectedPlantText = {
+  marginBottom: 12,
+  fontWeight: "bold",
+  color: "#14532d",
+};
+
+const input = {
+  width: "100%",
+  padding: 12,
+  marginBottom: 12,
+  borderRadius: 8,
+  border: "1px solid #ccc",
+};
+
+const button = {
+  width: "100%",
+  padding: 14,
+  borderRadius: 10,
+  border: "none",
+  background: "#166534",
+  color: "white",
+  fontSize: 16,
+  cursor: "pointer",
+};
