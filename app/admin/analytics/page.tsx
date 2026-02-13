@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -6,7 +7,7 @@ export default async function AdminAnalyticsPage() {
   // 1️⃣ Fetch all paid plants
   const { data: orders, error } = await supabase
     .from("plants")
-    .select("id, plant_type, payment_status, created_at")
+    .select("id, name, plant_type, payment_status, created_at")
     .eq("payment_status", true)
     .order("created_at", { ascending: false });
 
@@ -16,7 +17,7 @@ export default async function AdminAnalyticsPage() {
 
   const totalOrders = orders.length;
 
-  // 2️⃣ Price map (same as buy page)
+  // 2️⃣ Price map
   const prices: Record<string, number> = {
     "red-gerbera": 399,
     "pink-gerbera": 349,
@@ -24,9 +25,6 @@ export default async function AdminAnalyticsPage() {
     "white-gerbera": 399,
     "orange-gerbera": 349,
     "red-rose": 449,
-    "yellow-chrysanthemum": 299,
-    "white-chrysanthemum": 299,
-    "pink-chrysanthemum": 299,
     "money-plant": 349,
   };
 
@@ -36,9 +34,8 @@ export default async function AdminAnalyticsPage() {
     0
   );
 
-  // 4️⃣ Find best-selling plant
+  // 4️⃣ Best selling plant
   const count: Record<string, number> = {};
-
   orders.forEach((o) => {
     count[o.plant_type] = (count[o.plant_type] || 0) + 1;
   });
@@ -50,22 +47,32 @@ export default async function AdminAnalyticsPage() {
     <div style={page}>
       <h1 style={title}>PA Roots Admin Analytics 🌱</h1>
 
-      {/* STATS */}
+      {/* 📊 STATS */}
       <div style={statsGrid}>
         <StatCard label="Total Orders" value={totalOrders} />
         <StatCard label="Total Revenue" value={`₹${totalRevenue}`} />
         <StatCard label="Best Selling Plant" value={bestPlant} />
       </div>
 
-      {/* RECENT ORDERS */}
+      {/* 📦 RECENT ORDERS */}
       <h2 style={sectionTitle}>Recent Orders</h2>
 
       <div style={table}>
         {orders.map((o) => (
           <div key={o.id} style={row}>
-            <span>{o.plant_type}</span>
-            <span>₹{prices[o.plant_type]}</span>
+            <div>
+              <p style={plantName}>{o.name}</p>
+              <p style={plantType}>{o.plant_type}</p>
+            </div>
+
+            <span>₹{prices[o.plant_type] || "-"}</span>
+
             <span>{new Date(o.created_at).toLocaleDateString()}</span>
+
+            {/* 🌿 NEW → VIEW QR BUTTON */}
+            <Link href={`/result/${o.id}`} target="_blank">
+              <button style={qrBtn}>View QR</button>
+            </Link>
           </div>
         ))}
       </div>
@@ -136,10 +143,31 @@ const table: React.CSSProperties = {
 };
 
 const row: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  padding: "10px 0",
+  display: "grid",
+  gridTemplateColumns: "2fr 1fr 1fr auto",
+  alignItems: "center",
+  gap: 10,
+  padding: "12px 0",
   borderBottom: "1px solid #eee",
+};
+
+const plantName: React.CSSProperties = {
+  fontWeight: "bold",
+  color: "#14532d",
+};
+
+const plantType: React.CSSProperties = {
+  fontSize: 12,
+  color: "#6b7280",
+};
+
+const qrBtn: React.CSSProperties = {
+  background: "#166534",
+  color: "white",
+  border: "none",
+  padding: "8px 14px",
+  borderRadius: 8,
+  cursor: "pointer",
 };
 
 const center: React.CSSProperties = {

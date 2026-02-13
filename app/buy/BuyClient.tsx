@@ -9,18 +9,53 @@ export default function BuyPage() {
 
   const plantType = params.get("type");
 
-  const plantPrices: Record<string, { name: string; price: number }> = {
-    "red-gerbera": { name: "Red Gerbera", price: 399 },
-    "pink-gerbera": { name: "Pink Gerbera", price: 349 },
-    "yellow-gerbera": { name: "Yellow Gerbera", price: 349 },
-    "white-gerbera": { name: "White Gerbera", price: 399 },
-    "orange-gerbera": { name: "Orange Gerbera", price: 349 },
-    "red-rose": { name: "Red Rose", price: 449 },
-    "yellow-chrysanthemum": { name: "Yellow Chrysanthemum", price: 299 },
-    "white-chrysanthemum": { name: "White Chrysanthemum", price: 299 },
-    "pink-chrysanthemum": { name: "Pink Chrysanthemum", price: 299 },
-    "money-plant": { name: "Money Plant", price: 349 },
-  };
+ const plantPrices: Record<string, { name: string; price: number }> = {
+    "peace-lily": { name: "Peace Lily", price: 349 },
+    "snake-plant": { name: "Snake Plant", price: 299 },
+    "areca-palm": { name: "Areca Palm", price: 399 },
+    birkin: { name: "Philodendron Birkin", price: 499 },
+    "white-princess": { name: "Philodendron White Princess", price: 549 },
+    "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 349 },
+    "peperomia-silver": { name: "Peperomia Silver Ripple", price: 349 },
+    "christmas-cactus": { name: "Christmas Cactus", price: 299 },
+    "adenium-green": { name: "Adenium Green", price: 399 },
+    "ZZZ": { name: "Zamioculcas(ZZ)", price: 399 },
+    "Imperial-Green": { name: "Imperial Green", price: 399 },
+    "Aglaonema-Thai": { name: "Aglaonema Thai", price: 399 },
+    "Aglaonema-Lipstick": { name: "Aglaonema Lipstick", price: 399 },
+    "Succulent": { name: "Succulent", price: 399 },
+    "Calathea": { name: "Calathea", price: 399 },
+    "Syngonium": { name: "Syngonium", price: 399 },
+    "Cactus": { name: "Cactus", price: 399 },
+    "Cana": { name: "Cana", price: 399 },
+    "Aptenia-Variegated": { name: "Aptenia Variegated", price: 399 },
+    "zz": { name: "Zamioculcas(ZZ) Premium", price: 399 },
+    "Heliconia-Fire": { name: "Heliconia Fire", price: 399 },
+
+    rose: { name: "Rose", price: 249 },
+
+    "Red gerbera": { name: "Red Gerbera", price: 199 },
+    "Pink gerbera": { name: "Pink Gerbera", price: 199 },
+    "Yellow gerbera": { name: "Yellow Gerbera", price: 199 },
+    "White gerbera": { name: "White Gerbera", price: 199 },
+    "Orange gerbera": { name: "Orange Gerbera", price: 199 },
+
+    lavender: { name: "Lavender", price: 299 },
+    portulaca: { name: "Portulaca Moss Rose", price: 199 },
+    crossandra: { name: "Crossandra", price: 199 },
+    azalea: { name: "Azalea", price: 299 },
+    jasmine: { name: "Arabian Jasmine", price: 249 },
+    gardenia: { name: "Gardenia", price: 299 },
+    "yellow kalanchoe": { name: "Yellow Kalanchoe", price: 249 },
+    "pink kalanchoe": { name: "Pink Kalanchoe", price: 249 },
+    bougainvillea: { name: "Bougainvillea", price: 349 },
+
+    bonsai: { name: "Bonsai Tree", price: 599 },
+    orchid: { name: "Dendrobium Orchid", price: 699 },
+    bird: { name: "Bird of Paradise", price: 799 },
+    adenium: { name: "Desert Rose (Adenium)", price: 599 },
+    "orange-philo": { name: "Philodendron Prince of Orange", price: 549 },
+     };
 
   const selectedPlant = plantType ? plantPrices[plantType] : null;
 
