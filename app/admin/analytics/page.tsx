@@ -4,10 +4,10 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function AdminAnalyticsPage() {
-  // 1️⃣ Fetch all paid plants
+  // 1️⃣ Fetch all paid plants (✅ added email)
   const { data: orders, error } = await supabase
     .from("plants")
-    .select("id, name, plant_type, payment_status, created_at")
+    .select("id, name, plant_type, email, payment_status, created_at")
     .eq("payment_status", true)
     .order("created_at", { ascending: false });
 
@@ -60,16 +60,22 @@ export default async function AdminAnalyticsPage() {
       <div style={table}>
         {orders.map((o) => (
           <div key={o.id} style={row}>
+            {/* 🌿 Plant info */}
             <div>
               <p style={plantName}>{o.name}</p>
               <p style={plantType}>{o.plant_type}</p>
+
+              {/* ✅ NEW → Registered Email */}
+              <p style={emailText}>{o.email}</p>
             </div>
 
+            {/* 💰 Price */}
             <span>₹{prices[o.plant_type] || "-"}</span>
 
+            {/* 📅 Date */}
             <span>{new Date(o.created_at).toLocaleDateString()}</span>
 
-            {/* 🌿 NEW → VIEW QR BUTTON */}
+            {/* 🔗 View QR */}
             <Link href={`/result/${o.id}`} target="_blank">
               <button style={qrBtn}>View QR</button>
             </Link>
@@ -159,6 +165,12 @@ const plantName: React.CSSProperties = {
 const plantType: React.CSSProperties = {
   fontSize: 12,
   color: "#6b7280",
+};
+
+const emailText: React.CSSProperties = {
+  fontSize: 12,
+  color: "#9ca3af",
+  marginTop: 2,
 };
 
 const qrBtn: React.CSSProperties = {

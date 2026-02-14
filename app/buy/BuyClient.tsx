@@ -13,7 +13,7 @@ export default function BuyPage() {
   const plantPrices: Record<string, { name: string; price: number }> = {
     "peace-lily": { name: "Peace Lily", price: 749 },
     "snake-plant": { name: "Snake Plant", price: 449 },
-    "areca-palm": { name: "Areca Palm", price: 599 },
+    "areca-palm": { name: "Areca Palm", price: 1 },
     birkin: { name: "Philodendron Birkin", price: 599 },
     "white-princess": { name: "Philodendron White Princess", price: 1099 },
     "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 449 },
@@ -220,8 +220,12 @@ export default function BuyPage() {
           Add to Cart 🛒
         </button>
 
-        <button type="submit" disabled={loading} style={button}>
-          {loading ? "Processing..." : "Pay & Create Plant"}
+        <button
+         type="submit"
+         disabled={loading}
+         style={{ ...button, marginTop: 12 }}   // 👈 add this line
+        >
+         {loading ? "Processing..." : "Pay & Create Plant"}
         </button>
       </form>
     </div>

@@ -72,12 +72,21 @@ export default function RootLayout({
               {cart.map((item, i) => (
                 <div key={i} style={cartItem}>
                   <div>
-                    <p style={{ fontWeight: "bold" }}>{item.name}</p>
+                    {/* 🌿 Plant display name */}
+                    <p style={{ fontWeight: "bold" }}>{item.nameLabel}</p>
+
+                    {/* ✍️ Custom plant name user typed */}
                     <p style={{ fontSize: 13, color: "#6b7280" }}>
+                      {item.plantName}
+                    </p>
+
+                    {/* 💰 Price */}
+                    <p style={{ fontSize: 13, color: "#166534" }}>
                       ₹{item.price}
                     </p>
                   </div>
 
+                  {/* ❌ remove */}
                   <button style={removeBtn} onClick={() => removeItem(i)}>
                     ✕
                   </button>
