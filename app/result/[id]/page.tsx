@@ -49,6 +49,10 @@ export default function AdminResultPage() {
         <br />
         Please reply to the email with your delivery address so we can send your
         living memory plant to you.
+        <br />
+        Kindly share the payment completition SS and ur email registered with the plant to the whatsapp number 8667794361 to get live updates of ur Plant
+        <br/>
+        ThankYou!
       </p>
 
       {/* 🖨️ Print button */}
