@@ -9,53 +9,53 @@ export default function BuyPage() {
 
   const plantType = params.get("type");
 
- const plantPrices: Record<string, { name: string; price: number }> = {
-    "peace-lily": { name: "Peace Lily", price: 349 },
-    "snake-plant": { name: "Snake Plant", price: 299 },
-    "areca-palm": { name: "Areca Palm", price: 399 },
-    birkin: { name: "Philodendron Birkin", price: 499 },
-    "white-princess": { name: "Philodendron White Princess", price: 549 },
-    "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 349 },
-    "peperomia-silver": { name: "Peperomia Silver Ripple", price: 349 },
-    "christmas-cactus": { name: "Christmas Cactus", price: 299 },
-    "adenium-green": { name: "Adenium Green", price: 399 },
-    "ZZZ": { name: "Zamioculcas(ZZ)", price: 399 },
-    "Imperial-Green": { name: "Imperial Green", price: 399 },
-    "Aglaonema-Thai": { name: "Aglaonema Thai", price: 399 },
-    "Aglaonema-Lipstick": { name: "Aglaonema Lipstick", price: 399 },
-    "Succulent": { name: "Succulent", price: 399 },
-    "Calathea": { name: "Calathea", price: 399 },
-    "Syngonium": { name: "Syngonium", price: 399 },
-    "Cactus": { name: "Cactus", price: 399 },
-    "Cana": { name: "Cana", price: 399 },
-    "Aptenia-Variegated": { name: "Aptenia Variegated", price: 399 },
-    "zz": { name: "Zamioculcas(ZZ) Premium", price: 399 },
-    "Heliconia-Fire": { name: "Heliconia Fire", price: 399 },
+  /* 🌿 FINAL CLEAN PLANT PRICE MAP */
+  const plantPrices: Record<string, { name: string; price: number }> = {
+    "peace-lily": { name: "Peace Lily", price: 749 },
+    "snake-plant": { name: "Snake Plant", price: 449 },
+    "areca-palm": { name: "Areca Palm", price: 599 },
+    birkin: { name: "Philodendron Birkin", price: 599 },
+    "white-princess": { name: "Philodendron White Princess", price: 1099 },
+    "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 449 },
+    "peperomia-silver": { name: "Peperomia Silver Ripple", price: 449 },
+    "christmas-cactus": { name: "Christmas Cactus", price: 699 },
 
-    rose: { name: "Rose", price: 249 },
+    ZZZ: { name: "Zamioculcas(ZZ)", price: 799 },
+    "zz": { name: "Zamioculcas(ZZ) Premium", price: 1299 },
 
-    "Red gerbera": { name: "Red Gerbera", price: 199 },
-    "Pink gerbera": { name: "Pink Gerbera", price: 199 },
-    "Yellow gerbera": { name: "Yellow Gerbera", price: 199 },
-    "White gerbera": { name: "White Gerbera", price: 199 },
-    "Orange gerbera": { name: "Orange Gerbera", price: 199 },
+    "Imperial-Green": { name: "Imperial Green", price: 849 },
+    "Aglaonema-Thai": { name: "Aglaonema Thai", price: 1399 },
+    "Aglaonema-Lipstick": { name: "Aglaonema Lipstick", price: 949 },
 
-    lavender: { name: "Lavender", price: 299 },
-    portulaca: { name: "Portulaca Moss Rose", price: 199 },
-    crossandra: { name: "Crossandra", price: 199 },
-    azalea: { name: "Azalea", price: 299 },
-    jasmine: { name: "Arabian Jasmine", price: 249 },
-    gardenia: { name: "Gardenia", price: 299 },
-    "yellow kalanchoe": { name: "Yellow Kalanchoe", price: 249 },
-    "pink kalanchoe": { name: "Pink Kalanchoe", price: 249 },
-    bougainvillea: { name: "Bougainvillea", price: 349 },
+    Succulent: { name: "Succulent", price: 549 },
+    Calathea: { name: "Calathea", price: 599 },
+    Syngonium: { name: "Syngonium", price: 429 },
+    Cactus: { name: "Cactus", price: 499 },
 
-    bonsai: { name: "Bonsai Tree", price: 599 },
-    orchid: { name: "Dendrobium Orchid", price: 699 },
+    Cana: { name: "Cana", price: 449 },
+    "Aptenia-Variegated": { name: "Aptenia Variegated", price: 649 },
+
+    rose: { name: "Rose", price: 349 },
+
+    "Red gerbera": { name: "Red Gerbera", price: 399 },
+    "Pink gerbera": { name: "Pink Gerbera", price: 399 },
+    "Yellow gerbera": { name: "Yellow Gerbera", price: 399 },
+    "White gerbera": { name: "White Gerbera", price: 399 },
+    "Orange gerbera": { name: "Orange Gerbera", price: 399 },
+
+    portulaca: { name: "Portulaca Moss Rose", price: 399 },
+    crossandra: { name: "Crossandra", price: 399 },
+    jasmine: { name: "Arabian Jasmine", price: 399 },
+    gardenia: { name: "Gardenia", price: 399 },
+    "Yellow kalanchoe": { name: "Yellow Kalanchoe", price: 549 },
+    "Pink kalanchoe": { name: "Pink Kalanchoe", price: 549 },
+
+    bonsai: { name: "Bonsai Tree", price: 999 },
+    orchid: { name: "Dendrobium Orchid", price: 1049 },
     bird: { name: "Bird of Paradise", price: 799 },
-    adenium: { name: "Desert Rose (Adenium)", price: 599 },
-    "orange-philo": { name: "Philodendron Prince of Orange", price: 549 },
-     };
+    "adenium": { name: "Desert Rose (Adenium)", price: 799 },
+    "orange-philo": { name: "Philodendron Prince of Orange", price: 849 },
+  };
 
   const selectedPlant = plantType ? plantPrices[plantType] : null;
 
@@ -63,6 +63,29 @@ export default function BuyPage() {
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+
+  /* 🛒 NEW — ADD TO CART FUNCTION */
+  function handleAddToCart() {
+    if (!name || !message || !email || !selectedPlant) {
+      alert("Please fill all fields and select a plant");
+      return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem("pa_roots_cart") || "[]");
+
+    cart.push({
+      plant_type: plantType,
+      plantName: name,
+      message,
+      email,
+      price: selectedPlant.price,
+      nameLabel: selectedPlant.name,
+    });
+
+    localStorage.setItem("pa_roots_cart", JSON.stringify(cart));
+
+    alert("Added to cart 🛒");
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,7 +98,7 @@ export default function BuyPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Create plant in DB
+      /* 1️⃣ CREATE PLANT */
       const plantRes = await fetch("/api/create-plant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -88,12 +111,11 @@ export default function BuyPage() {
       });
 
       const plantData = await plantRes.json();
-
       if (!plantRes.ok) throw new Error("Plant creation failed");
 
       const plantId = plantData.plant.id;
 
-      // 2️⃣ Create Razorpay order with correct amount
+      /* 2️⃣ CREATE ORDER */
       const orderRes = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,52 +123,52 @@ export default function BuyPage() {
       });
 
       const order = await orderRes.json();
-
       if (!orderRes.ok) throw new Error("Order creation failed");
 
-      // 3️⃣ Load Razorpay
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.async = true;
+      /* 3️⃣ LOAD RAZORPAY SAFELY */
+      if (!(window as any).Razorpay) {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        document.body.appendChild(script);
 
-      script.onload = () => {
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          amount: order.amount,
-          currency: order.currency,
-          name: "PA Roots",
-          description: `Advance for ${selectedPlant.name}`,
-          order_id: order.id,
+        await new Promise((res) => (script.onload = res));
+      }
 
-          handler: async function (response: any) {
-            const verifyRes = await fetch("/api/verify-payment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                plantId,
-              }),
-            });
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: "PA Roots",
+        description: `Advance for ${selectedPlant.name}`,
+        order_id: order.id,
 
-            if (!verifyRes.ok) {
-              alert("Payment verification failed ❌");
-              return;
-            }
+        handler: async function (response: any) {
+          const verifyRes = await fetch("/api/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plantId,
+            }),
+          });
 
-            router.push(`/result/${plantId}`);
-          },
+          if (!verifyRes.ok) {
+            alert("Payment verification failed ❌");
+            return;
+          }
 
-          prefill: { email },
-          theme: { color: "#166534" },
-        };
+          router.push(`/result/${plantId}`);
+        },
 
-        const rzp = new (window as any).Razorpay(options);
-        rzp.open();
+        prefill: { email },
+        theme: { color: "#166534" },
       };
 
-      document.body.appendChild(script);
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
     } catch (err) {
       console.error(err);
       alert("Something went wrong ❌");
@@ -162,7 +184,11 @@ export default function BuyPage() {
 
         {selectedPlant && (
           <p style={selectedPlantText}>
-            {selectedPlant.name} — ₹{selectedPlant.price}
+            {selectedPlant.name} — ₹{selectedPlant.price}  
+            <br />
+            <span style={{ fontSize: 13, color: "#6b7280" }}>
+              (Shipping, packaging & QR included)
+            </span>
           </p>
         )}
 
@@ -191,6 +217,11 @@ export default function BuyPage() {
           style={input}
         />
 
+        {/* 🛒 NEW BUTTON */}
+        <button type="button" onClick={handleAddToCart} style={button}>
+          Add to Cart 🛒
+        </button>
+
         <button type="submit" disabled={loading} style={button}>
           {loading ? "Processing..." : "Pay & Create Plant"}
         </button>
@@ -199,7 +230,8 @@ export default function BuyPage() {
   );
 }
 
-/* styles */
+/* ---------- STYLES ---------- */
+
 const page = {
   minHeight: "100vh",
   background: "#ecfdf5",

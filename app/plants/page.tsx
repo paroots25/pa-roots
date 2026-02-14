@@ -67,6 +67,8 @@ export default function PlantSelectionPage() {
     { name: "Bird of Paradise", type: "bird", price: "₹799", image: "/plants/Bird of Paradise.webp", category: "Premium Signature Plants" },
     { name: "Desert Rose (Adenium)", type: "adenium", price: "₹799", image: "/plants/Desert Rose (Adenium)1.webp", category: "Premium Signature Plants" },
     { name: "Zamioculcas(ZZ) Premium ", type: "zz", price: "₹1299", image: "/plants/Zamioculcas(ZZ)high.webp", category: "Premium Signature Plants" },
+    { name: "Philodendron Prince of Orange ", type: "orange-philo", price: "₹849", image: "/plants/Philodendron Prince of Orange.webp", category: "Premium Signature Plants" },
+    
     
     ];
 
