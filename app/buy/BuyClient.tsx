@@ -37,7 +37,7 @@ export default function BuyPage() {
 
     rose: { name: "Rose", price: 349 },
 
-    "Red gerbera": { name: "Red Gerbera", price: 15 },
+    "Red gerbera": { name: "Red Gerbera", price: 399 },
     "Pink gerbera": { name: "Pink Gerbera", price: 399 },
     "Yellow gerbera": { name: "Yellow Gerbera", price: 399 },
     "White gerbera": { name: "White Gerbera", price: 399 },
