@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { supabase } from "@/lib/supabase";
 
-/* 🔐 Razorpay instance */
+/* 🔐 Razorpay */
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
@@ -11,60 +11,44 @@ const razorpay = new Razorpay({
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { plants, email } = body;
+    const { plants } = body;
 
-    /* ---------------------------------- */
-    /* 0️⃣ BASIC VALIDATION */
-    /* ---------------------------------- */
-    if (!plants || !Array.isArray(plants) || plants.length === 0) {
+    /* ❌ No plants */
+    if (!plants || plants.length === 0) {
       return NextResponse.json(
         { error: "No plants provided" },
         { status: 400 }
       );
     }
 
-    if (!email) {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      );
-    }
-
     /* ---------------------------------- */
-    /* 1️⃣ CALCULATE TOTAL PRICE SAFELY */
+    /* 1️⃣ TOTAL PRICE */
     /* ---------------------------------- */
-    const totalAmount = plants.reduce((sum: number, p: any) => {
-      const price = Number(p.price) || 0;
-      return sum + price;
-    }, 0);
+    const totalAmount = plants.reduce(
+      (sum: number, p: any) => sum + Number(p.price),
+      0
+    );
 
-    if (totalAmount <= 0) {
-      return NextResponse.json(
-        { error: "Invalid total amount" },
-        { status: 400 }
-      );
-    }
-
-    /* Razorpay expects paise */
     const amountInPaise = totalAmount * 100;
 
     /* ---------------------------------- */
-    /* 2️⃣ CREATE PLANTS IN DB */
+    /* 2️⃣ INSERT PLANTS INTO SUPABASE */
+    /* 🔥 IMPORTANT FIX: correct field names */
     /* ---------------------------------- */
     const { data: createdPlants, error: plantError } = await supabase
       .from("plants")
       .insert(
         plants.map((p: any) => ({
-          name: p.name,
+          name: p.plantName,          // ✅ FIXED
           message: p.message,
-          email,
-          plant_type: p.type,
+          email: p.email,
+          plant_type: p.plant_type,
           payment_status: false,
         }))
       )
       .select("id");
 
-    if (plantError || !createdPlants) {
+    if (plantError) {
       console.error("PLANT INSERT ERROR:", plantError);
       return NextResponse.json(
         { error: "Failed to create plants" },
@@ -84,10 +68,9 @@ export async function POST(req: Request) {
     });
 
     /* ---------------------------------- */
-    /* 4️⃣ RETURN RESPONSE */
+    /* 4️⃣ RETURN */
     /* ---------------------------------- */
     return NextResponse.json({
-      success: true,
       order,
       plantIds,
       totalAmount,
@@ -96,7 +79,7 @@ export async function POST(req: Request) {
     console.error("CREATE ORDER WITH PLANTS ERROR:", error);
 
     return NextResponse.json(
-      { error: "Server error while creating order" },
+      { error: "Server error" },
       { status: 500 }
     );
   }

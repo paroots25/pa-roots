@@ -8,12 +8,33 @@ export default function AdminResultPage() {
   const params = useParams();
   const id = params.id as string;
 
-  const [link, setLink] = useState("");
+  const [links, setLinks] = useState<string[]>([]);
 
-  // ✅ Build memory link safely on client
+  // ✅ Build memory links safely on client
   useEffect(() => {
     if (typeof window !== "undefined" && id) {
-      setLink(`${window.location.origin}/plant/${id}`);
+      /**
+       * MULTI-QR LOGIC:
+       * If checkout stored multiple plant IDs → show all
+       * Otherwise → show single plant QR
+       */
+      const storedIds = sessionStorage.getItem("pa_roots_last_order");
+
+      if (storedIds) {
+        const ids: string[] = JSON.parse(storedIds);
+
+        const builtLinks = ids.map(
+          (plantId) => `${window.location.origin}/plant/${plantId}`
+        );
+
+        setLinks(builtLinks);
+
+        // clear after showing once
+        sessionStorage.removeItem("pa_roots_last_order");
+      } else {
+        // single plant fallback
+        setLinks([`${window.location.origin}/plant/${id}`]);
+      }
     }
   }, [id]);
 
@@ -28,19 +49,19 @@ export default function AdminResultPage() {
         Place it near the plant and let memories grow forever.
       </p>
 
-      {/* 📱 QR Code */}
-      {link && (
-        <div style={qrWrap}>
-          <QRCodeCanvas value={link} size={220} />
-        </div>
-      )}
+      {/* 📱 QR Codes */}
+      <div style={{ marginTop: 30 }}>
+        {links.map((link, i) => (
+          <div key={i} style={{ marginBottom: 30 }}>
+            <QRCodeCanvas value={link} size={220} />
 
-      {/* 🔗 CLICKABLE MEMORY LINK */}
-      {link && (
-        <a href={link} target="_blank" style={linkStyle}>
-          {link}
-        </a>
-      )}
+            {/* 🔗 CLICKABLE MEMORY LINK */}
+            <a href={link} target="_blank" style={linkStyle}>
+              {link}
+            </a>
+          </div>
+        ))}
+      </div>
 
       {/* 📩 Email instruction */}
       <p style={emailNote}>
@@ -50,9 +71,10 @@ export default function AdminResultPage() {
         Please reply to the email with your delivery address so we can send your
         living memory plant to you.
         <br />
-        Kindly share the payment completition SS and ur email registered with the plant to the whatsapp number 8667794361 to get live updates of ur Plant
-        <br/>
-        ThankYou!
+        Kindly share the payment completion SS and your registered email to
+        WhatsApp number <b>8667794361</b> to get live updates of your plant.
+        <br />
+        Thank you!
       </p>
 
       {/* 🖨️ Print button */}
@@ -87,12 +109,9 @@ const subtitle: React.CSSProperties = {
   maxWidth: 420,
 };
 
-const qrWrap: React.CSSProperties = {
-  marginTop: 30,
-};
-
 const linkStyle: React.CSSProperties = {
-  marginTop: 20,
+  display: "block",
+  marginTop: 12,
   fontWeight: "bold",
   color: "#166534",
   wordBreak: "break-all",

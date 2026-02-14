@@ -37,7 +37,7 @@ export default function BuyPage() {
 
     rose: { name: "Rose", price: 349 },
 
-    "Red gerbera": { name: "Red Gerbera", price: 399 },
+    "Red gerbera": { name: "Red Gerbera", price: 15 },
     "Pink gerbera": { name: "Pink Gerbera", price: 399 },
     "Yellow gerbera": { name: "Yellow Gerbera", price: 399 },
     "White gerbera": { name: "White Gerbera", price: 399 },
@@ -53,7 +53,7 @@ export default function BuyPage() {
     bonsai: { name: "Bonsai Tree", price: 999 },
     orchid: { name: "Dendrobium Orchid", price: 1049 },
     bird: { name: "Bird of Paradise", price: 799 },
-    "adenium": { name: "Desert Rose (Adenium)", price: 799 },
+    adenium: { name: "Desert Rose (Adenium)", price: 799 },
     "orange-philo": { name: "Philodendron Prince of Orange", price: 849 },
   };
 
@@ -64,7 +64,7 @@ export default function BuyPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  /* 🛒 NEW — ADD TO CART FUNCTION */
+  /* 🛒 ADD TO CART */
   function handleAddToCart() {
     if (!name || !message || !email || !selectedPlant) {
       alert("Please fill all fields and select a plant");
@@ -125,13 +125,12 @@ export default function BuyPage() {
       const order = await orderRes.json();
       if (!orderRes.ok) throw new Error("Order creation failed");
 
-      /* 3️⃣ LOAD RAZORPAY SAFELY */
+      /* 3️⃣ LOAD RAZORPAY */
       if (!(window as any).Razorpay) {
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.async = true;
         document.body.appendChild(script);
-
         await new Promise((res) => (script.onload = res));
       }
 
@@ -184,7 +183,7 @@ export default function BuyPage() {
 
         {selectedPlant && (
           <p style={selectedPlantText}>
-            {selectedPlant.name} — ₹{selectedPlant.price}  
+            {selectedPlant.name} — ₹{selectedPlant.price}
             <br />
             <span style={{ fontSize: 13, color: "#6b7280" }}>
               (Shipping, packaging & QR included)
@@ -217,7 +216,6 @@ export default function BuyPage() {
           style={input}
         />
 
-        {/* 🛒 NEW BUTTON */}
         <button type="button" onClick={handleAddToCart} style={button}>
           Add to Cart 🛒
         </button>

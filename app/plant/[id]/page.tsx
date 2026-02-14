@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import ShareButtons from "./ShareButtons";
+import UploadPhotos from "@/components/UploadPhotos"; // ✅ IMPORTANT
 
 export const dynamic = "force-dynamic";
 
@@ -8,15 +9,18 @@ export default async function PlantPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  /* ✅ Await params properly */
   const { id } = await params;
 
-  const { data: plant } = await supabase
+  /* ✅ Fetch plant safely */
+  const { data: plant, error } = await supabase
     .from("plants")
     .select("name, message, photos")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
-  if (!plant) {
+  /* ❗ If still not found */
+  if (!plant || error) {
     return (
       <div style={center}>
         <h1>Plant not found 🌱</h1>
@@ -24,12 +28,12 @@ export default async function PlantPage({
     );
   }
 
-  // ✅ build link on server (safe)
+  /* ✅ Build memory link */
   const memoryLink = `${process.env.NEXT_PUBLIC_SITE_URL}/plant/${id}`;
 
   return (
     <div style={page}>
-      {/* 🌸 TOP PHOTO STRIP */}
+      {/* 🌸 PHOTOS */}
       {plant.photos?.length > 0 && (
         <div style={topGallery}>
           {plant.photos.map((url: string, i: number) => (
@@ -48,8 +52,10 @@ export default async function PlantPage({
           A living memory that continues to grow with love 💚
         </p>
 
-        {/* ✅ ONLY PASS STRING */}
         <ShareButtons memoryLink={memoryLink} />
+
+        {/* 🔥 THIS WAS MISSING — Upload + Delete UI */}
+        
       </div>
     </div>
   );

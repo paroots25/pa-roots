@@ -10,7 +10,7 @@ export default function DashboardPage() {
   const [message, setMessage] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [files, setFiles] = useState<FileList | null>(null);
-  const [memoryLink, setMemoryLink] = useState(""); // ✅ hydration-safe
+  const [memoryLink, setMemoryLink] = useState("");
   const [loading, setLoading] = useState(false);
 
   /* ---------------- LOAD PLANT ---------------- */
@@ -28,7 +28,7 @@ export default function DashboardPage() {
     if (id) loadPlant();
   }, [id]);
 
-  /* ---------------- BUILD MEMORY LINK (CLIENT ONLY) ---------------- */
+  /* ---------------- BUILD MEMORY LINK ---------------- */
   useEffect(() => {
     if (id) {
       setMemoryLink(`${window.location.origin}/plant/${id}`);
@@ -51,7 +51,7 @@ export default function DashboardPage() {
     else alert("Memory saved 🌱");
   }
 
-  /* ---------------- UPLOAD MULTIPLE PHOTOS ---------------- */
+  /* ---------------- UPLOAD PHOTOS ---------------- */
   async function handleUploadPhotos() {
     if (!files || files.length === 0) {
       alert("Select photos first 📸");
@@ -80,6 +80,28 @@ export default function DashboardPage() {
     } else {
       setPhotos(data.photos || []);
       alert("Photos uploaded 🌸");
+    }
+  }
+
+  /* ---------------- DELETE PHOTO ---------------- */
+  async function handleDeletePhoto(url: string) {
+    if (!confirm("Delete this photo?")) return;
+
+    setLoading(true);
+
+    const res = await fetch("/api/delete-photo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, url }),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (!res.ok) {
+      alert("Delete failed ❌");
+    } else {
+      setPhotos(data.photos || []);
     }
   }
 
@@ -119,11 +141,21 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* PHOTO GRID */}
+        {/* PHOTO GRID WITH DELETE */}
         {photos.length > 0 && (
           <div style={photoGrid}>
             {photos.map((url, i) => (
-              <img key={i} src={url} style={photo} />
+              <div key={i} style={photoWrap}>
+                <img src={url} style={photo} />
+
+                {/* DELETE BUTTON */}
+                <button
+                  onClick={() => handleDeletePhoto(url)}
+                  style={deleteBtn}
+                >
+                  Delete
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -206,11 +238,28 @@ const photoGrid: React.CSSProperties = {
   marginTop: 20,
 };
 
+const photoWrap: React.CSSProperties = {
+  position: "relative",
+};
+
 const photo: React.CSSProperties = {
   width: "100%",
   borderRadius: 10,
   objectFit: "cover",
   height: 100,
+};
+
+const deleteBtn: React.CSSProperties = {
+  position: "absolute",
+  top: 6,
+  right: 6,
+  background: "rgba(220,38,38,0.9)",
+  color: "white",
+  border: "none",
+  borderRadius: 6,
+  padding: "2px 6px",
+  fontSize: 12,
+  cursor: "pointer",
 };
 
 const qrBtn: React.CSSProperties = {

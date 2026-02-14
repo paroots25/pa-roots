@@ -29,7 +29,10 @@ export default function CheckoutPage() {
       const orderRes = await fetch("/api/create-order-with-plants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart }),
+        body: JSON.stringify({
+          plants: cart,
+          email: cart[0]?.email || "",
+        }),
       });
 
       const data = await orderRes.json();
@@ -44,7 +47,9 @@ export default function CheckoutPage() {
         script.async = true;
         document.body.appendChild(script);
 
-        await new Promise((res) => (script.onload = res));
+        await new Promise((res) => {
+          script.onload = res;
+        });
       }
 
       /* 3️⃣ Razorpay payment */
@@ -74,10 +79,16 @@ export default function CheckoutPage() {
             return;
           }
 
-          /* 5️⃣ Clear cart */
+          /* ✅ SAVE IDS FOR MULTI-QR RESULT PAGE */
+          sessionStorage.setItem(
+            "pa_roots_last_order",
+            JSON.stringify(plantIds)
+          );
+
+          /* 🧹 Clear cart */
           localStorage.removeItem("pa_roots_cart");
 
-          /* 6️⃣ Go to MULTI-ORDER result page */
+          /* 🚀 Redirect to multi-order result */
           router.push(`/order-result/${plantIds[0]}`);
         },
 
@@ -103,7 +114,7 @@ export default function CheckoutPage() {
 
         {cart.map((item, i) => (
           <div key={i} style={row}>
-            <span>{item.name}</span>
+            <span>{item.nameLabel || item.name}</span>
             <span>₹{item.price}</span>
           </div>
         ))}
