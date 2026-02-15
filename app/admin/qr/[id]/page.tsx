@@ -8,11 +8,11 @@ export default function AdminQRPage() {
   const params = useParams();
   const id = params.id as string;
 
-  const [link, setLink] = useState("");
+  const [link, setLink] = useState<string | null>(null);
 
-  /* build plant memory link */
+  /* build plant memory link safely */
   useEffect(() => {
-    if (id) {
+    if (typeof window !== "undefined" && id) {
       setLink(`${window.location.origin}/plant/${id}`);
     }
   }, [id]);
@@ -25,30 +25,36 @@ export default function AdminQRPage() {
         Print this QR and attach it to the physical plant.
       </p>
 
+      {/* 🔄 loading state */}
+      {!link && <p style={{ marginTop: 20 }}>Generating QR...</p>}
+
+      {/* ✅ QR always shows when link ready */}
       {link && (
-        <div style={qrWrap}>
-          <QRCodeCanvas value={link} size={240} />
-        </div>
+        <>
+          <div style={qrWrap}>
+            <QRCodeCanvas value={link} size={240} />
+          </div>
+
+          <a
+            href={link}
+            target="_blank"
+            style={{
+              display: "block",
+              marginTop: 12,
+              fontWeight: "bold",
+              color: "#166534",
+              wordBreak: "break-all",
+              textDecoration: "underline",
+            }}
+          >
+            Open Memory Page 🌿
+          </a>
+
+          <button onClick={() => window.print()} style={printBtn}>
+            Print QR Sticker 🖨️
+          </button>
+        </>
       )}
-
-      <a
-        href={link}
-        target="_blank"
-        style={{
-          display: "block",
-          marginTop: 12,
-          fontWeight: "bold",
-          color: "#166534",
-          wordBreak: "break-all",
-          textDecoration: "underline",
-        }}
-     >
-        Open Memory Page 🌿
-     </a>
-
-      <button onClick={() => window.print()} style={printBtn}>
-        Print QR Sticker 🖨️
-      </button>
     </div>
   );
 }
@@ -78,13 +84,6 @@ const subtitle: React.CSSProperties = {
 
 const qrWrap: React.CSSProperties = {
   marginTop: 30,
-};
-
-const linkText: React.CSSProperties = {
-  marginTop: 16,
-  fontWeight: "bold",
-  color: "#166534",
-  wordBreak: "break-all",
 };
 
 const printBtn: React.CSSProperties = {
