@@ -10,21 +10,21 @@ export default function BuyPage() {
   const plantType = params.get("type");
 
   const plantPrices: Record<string, { name: string; price: number }> = {
-    "peace-lily": { name: "Peace Lily", price: 799 },
-    "snake-plant": { name: "Snake Plant", price: 499 },
+    "peace-lily": { name: "Peace Lily", price: 749 },
+    "snake-plant": { name: "Snake Plant", price: 449 },
     "areca-palm": { name: "Areca Palm", price: 1 },
-    birkin: { name: "Philodendron Birkin", price: 649 },
-    "white-princess": { name: "Philodendron White Princess", price: 1149 },
-    "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 499 },
-    "peperomia-silver": { name: "Peperomia Silver Ripple", price: 499 },
-    "christmas-cactus": { name: "Christmas Cactus", price: 749 },
-    ZZZ: { name: "Zamioculcas(ZZ)", price: 849 },
-    zz: { name: "Zamioculcas(ZZ) Premium", price: 1349 },
-    "Imperial-Green": { name: "Imperial Green", price: 899 },
-    "Aglaonema-Thai": { name: "Aglaonema Thai", price: 1449 },
-    "Aglaonema-Lipstick": { name: "Aglaonema Lipstick", price: 999 },
-    Succulent: { name: "Succulent", price: 599 },
-    Calathea: { name: "Calathea", price: 649 },
+    birkin: { name: "Philodendron Birkin", price: 599 },
+    "white-princess": { name: "Philodendron White Princess", price: 1099 },
+    "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 449 },
+    "peperomia-silver": { name: "Peperomia Silver Ripple", price: 449 },
+    "christmas-cactus": { name: "Christmas Cactus", price: 699 },
+    ZZZ: { name: "Zamioculcas(ZZ)", price: 799 },
+    zz: { name: "Zamioculcas(ZZ) Premium", price: 1299 },
+    "Imperial-Green": { name: "Imperial Green", price: 849 },
+    "Aglaonema-Thai": { name: "Aglaonema Thai", price: 1399 },
+    "Aglaonema-Lipstick": { name: "Aglaonema Lipstick", price: 949 },
+    Succulent: { name: "Succulent", price: 549 },
+    Calathea: { name: "Calathea", price: 599 },
     Syngonium: { name: "Syngonium", price: 429 },
     Cactus: { name: "Cactus", price: 499 },
     Cana: { name: "Cana", price: 449 },
@@ -53,12 +53,12 @@ export default function BuyPage() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState(""); // ✅ NEW
   const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
 
-  /* 🛒 ADD TO CART */
   function handleAddToCart() {
-    if (!name || !message || !email || !location || !selectedPlant) {
+    if (!name || !message || !email || !phone || !location || !selectedPlant) {
       alert("Please fill all fields and select a plant");
       return;
     }
@@ -70,20 +70,20 @@ export default function BuyPage() {
       plantName: name,
       message,
       email,
+      phone, // ✅ NEW
       location,
       price: selectedPlant.price,
       nameLabel: selectedPlant.name,
     });
 
     localStorage.setItem("pa_roots_cart", JSON.stringify(cart));
-
     alert("Added to cart 🛒");
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!name || !message || !email || !location || !selectedPlant) {
+    if (!name || !message || !email || !phone || !location || !selectedPlant) {
       alert("Please fill all fields and select a plant");
       return;
     }
@@ -98,6 +98,7 @@ export default function BuyPage() {
           name,
           message,
           email,
+          phone, // ✅ NEW
           location,
           plant_type: plantType,
         }),
@@ -153,7 +154,7 @@ export default function BuyPage() {
           router.push(`/result/${plantId}`);
         },
 
-        prefill: { email },
+        prefill: { email, contact: phone }, // ✅ Razorpay phone autofill
         theme: { color: "#166534" },
       };
 
@@ -172,64 +173,41 @@ export default function BuyPage() {
       <form onSubmit={handleSubmit} style={form}>
         <h1 style={title}>Buy Your Memory Plant 🌱</h1>
 
-        {/* ⭐ NEW COST INFO LINE */}
         <p style={costInfo}>
           All costs including packaging & shipping are already included.
           No extra charges needed.
-          Free Pots are included.
+          Free Pots are Included
         </p>
-        
 
         {selectedPlant && (
           <p style={selectedPlantText}>
             {selectedPlant.name} — ₹{selectedPlant.price}
           </p>
-
-          
         )}
 
+        <input placeholder="Plant name" value={name} onChange={(e) => setName(e.target.value)} required style={input} />
+
+        <textarea placeholder="Memory message" value={message} onChange={(e) => setMessage(e.target.value)} required style={{ ...input, minHeight: 90 }} />
+
+        <input type="email" placeholder="Your email address" value={email} onChange={(e) => setEmail(e.target.value)} required style={input} />
+
+        {/* ✅ NEW PHONE FIELD */}
         <input
-          placeholder="Plant name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          type="tel"
+          placeholder="Phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           required
           style={input}
         />
 
-        <textarea
-          placeholder="Memory message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          required
-          style={{ ...input, minHeight: 90 }}
-        />
-
-        <input
-          type="email"
-          placeholder="Your email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={input}
-        />
-
-        <input
-          placeholder="Delivery location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-          style={input}
-        />
+        <input placeholder="Delivery location" value={location} onChange={(e) => setLocation(e.target.value)} required style={input} />
 
         <button type="button" onClick={handleAddToCart} style={button}>
           Add to Cart 🛒
         </button>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ ...button, marginTop: 12 }}
-        >
+        <button type="submit" disabled={loading} style={{ ...button, marginTop: 12 }}>
           {loading ? "Processing..." : "Pay & Create Plant"}
         </button>
       </form>
@@ -237,57 +215,11 @@ export default function BuyPage() {
   );
 }
 
-/* ---------- STYLES ---------- */
-
-const page = {
-  minHeight: "100vh",
-  background: "#ecfdf5",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const form = {
-  background: "white",
-  padding: 30,
-  borderRadius: 16,
-  width: 360,
-  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-};
-
+/* styles unchanged */
+const page = { minHeight: "100vh", background: "#ecfdf5", display: "flex", justifyContent: "center", alignItems: "center" };
+const form = { background: "white", padding: 30, borderRadius: 16, width: 360, boxShadow: "0 10px 25px rgba(0,0,0,0.08)" };
 const title = { color: "#166534", marginBottom: 10 };
-
-const costInfo = {
-  fontSize: 13,
-  color: "#065f46",
-  background: "#d1fae5",
-  padding: "8px 12px",
-  borderRadius: 8,
-  marginBottom: 14,
-  textAlign: "center" as const,
-};
-
-const selectedPlantText = {
-  marginBottom: 12,
-  fontWeight: "bold",
-  color: "#14532d",
-};
-
-const input = {
-  width: "100%",
-  padding: 12,
-  marginBottom: 12,
-  borderRadius: 8,
-  border: "1px solid #ccc",
-};
-
-const button = {
-  width: "100%",
-  padding: 14,
-  borderRadius: 10,
-  border: "none",
-  background: "#166534",
-  color: "white",
-  fontSize: 16,
-  cursor: "pointer",
-};
+const costInfo = { fontSize: 13, color: "#065f46", background: "#d1fae5", padding: "8px 12px", borderRadius: 8, marginBottom: 14, textAlign: "center" as const };
+const selectedPlantText = { marginBottom: 12, fontWeight: "bold", color: "#14532d" };
+const input = { width: "100%", padding: 12, marginBottom: 12, borderRadius: 8, border: "1px solid #ccc" };
+const button = { width: "100%", padding: 14, borderRadius: 10, border: "none", background: "#166534", color: "white", fontSize: 16, cursor: "pointer" };
