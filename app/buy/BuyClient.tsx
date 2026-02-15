@@ -12,7 +12,7 @@ export default function BuyPage() {
   const plantPrices: Record<string, { name: string; price: number }> = {
     "peace-lily": { name: "Peace Lily", price: 749 },
     "snake-plant": { name: "Snake Plant", price: 449 },
-    "areca-palm": { name: "Areca Palm", price: 1 },
+    "areca-palm": { name: "Areca Palm", price: 599 },
     birkin: { name: "Philodendron Birkin", price: 599 },
     "white-princess": { name: "Philodendron White Princess", price: 1099 },
     "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 449 },

@@ -107,13 +107,15 @@ export default function PlantSelectionPage() {
                 return (
                   <div key={plant.type} style={card}>
                     <div style={{ position: "relative", width: "100%", height: 170 }}>
-                      <Image
-                        src={plant.image}
-                        alt={plant.name}
-                        fill
-                        sizes="(max-width: 768px) 50vw, 240px"
-                        style={{ objectFit: "cover" }}
-                        loading="lazy"
+                     <img
+                       src={plant.image}
+                       style={{
+                         width: "100%",
+                         height: 160,
+                         objectFit: window.innerWidth < 640 ? "contain" : "cover", // ✅ mobile fix
+                         background: "#f0fdf4", // nice padding when contain
+                         borderRadius: 12,
+                       }}
                       />
                     </div>
 
