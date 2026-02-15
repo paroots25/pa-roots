@@ -31,7 +31,10 @@ export default function DashboardPage() {
   /* ---------------- BUILD MEMORY LINK ---------------- */
   useEffect(() => {
     if (id) {
-      setMemoryLink(`${window.location.origin}/plant/${id}`);
+      const baseUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+
+      setMemoryLink(`${baseUrl}/plant/${id}`);
     }
   }, [id]);
 
