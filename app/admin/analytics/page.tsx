@@ -1,13 +1,40 @@
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
+/* 🔐 NEW → protect admin route */
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminAnalyticsPage() {
-  // 1️⃣ Fetch all paid plants (✅ added email)
+  /* 🔐 CHECK ADMIN SESSION */
+  const cookieStore = await cookies();
+
+  const supabaseServer = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get: (name) => cookieStore.get(name)?.value,
+      },
+    }
+  );
+
+  const {
+    data: { session },
+  } = await supabaseServer.auth.getSession();
+
+  /* ❌ If not logged in → go to login page */
+  if (!session) {
+    redirect("/admin/login");
+  }
+
+  /* 1️⃣ Fetch all paid plants (✅ added email + price) */
   const { data: orders, error } = await supabase
     .from("plants")
-    .select("id, name, plant_type, email, payment_status, created_at")
+    .select("id, name, plant_type, email, price, payment_status, created_at")
     .eq("payment_status", true)
     .order("created_at", { ascending: false });
 
@@ -17,24 +44,13 @@ export default async function AdminAnalyticsPage() {
 
   const totalOrders = orders.length;
 
-  // 2️⃣ Price map
-  const prices: Record<string, number> = {
-    "red-gerbera": 399,
-    "pink-gerbera": 349,
-    "yellow-gerbera": 349,
-    "white-gerbera": 399,
-    "orange-gerbera": 349,
-    "red-rose": 449,
-    "money-plant": 349,
-  };
-
-  // 3️⃣ Calculate revenue
+  /* 2️⃣ Calculate revenue (✅ REAL revenue from DB price) */
   const totalRevenue = orders.reduce(
-    (sum, order) => sum + (prices[order.plant_type] || 0),
+    (sum, order) => sum + (order.price || 0),
     0
   );
 
-  // 4️⃣ Best selling plant
+  /* 3️⃣ Best selling plant */
   const count: Record<string, number> = {};
   orders.forEach((o) => {
     count[o.plant_type] = (count[o.plant_type] || 0) + 1;
@@ -45,6 +61,11 @@ export default async function AdminAnalyticsPage() {
 
   return (
     <div style={page}>
+      {/* 🔐 Logout button */}
+      <form action="/auth/logout" method="post" style={{ marginBottom: 20 }}>
+        <button style={logoutBtn}>Logout</button>
+      </form>
+
       <h1 style={title}>PA Roots Admin Analytics 🌱</h1>
 
       {/* 📊 STATS */}
@@ -65,18 +86,18 @@ export default async function AdminAnalyticsPage() {
               <p style={plantName}>{o.name}</p>
               <p style={plantType}>{o.plant_type}</p>
 
-              {/* ✅ NEW → Registered Email */}
+              {/* ✅ Registered Email */}
               <p style={emailText}>{o.email}</p>
             </div>
 
-            {/* 💰 Price */}
-            <span>₹{prices[o.plant_type] || "-"}</span>
+            {/* 💰 Real price from DB */}
+            <span>₹{o.price || "-"}</span>
 
             {/* 📅 Date */}
             <span>{new Date(o.created_at).toLocaleDateString()}</span>
 
             {/* 🔗 View QR */}
-            <Link href={`/result/${o.id}`} target="_blank">
+            <Link href={`/admin/qr/${o.id}`} target="_blank">
               <button style={qrBtn}>View QR</button>
             </Link>
           </div>
@@ -175,6 +196,16 @@ const emailText: React.CSSProperties = {
 
 const qrBtn: React.CSSProperties = {
   background: "#166534",
+  color: "white",
+  border: "none",
+  padding: "8px 14px",
+  borderRadius: 8,
+  cursor: "pointer",
+};
+
+/* 🔐 NEW logout style */
+const logoutBtn: React.CSSProperties = {
+  background: "#ef4444",
   color: "white",
   border: "none",
   padding: "8px 14px",

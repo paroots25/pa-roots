@@ -62,11 +62,13 @@ export default function BuyPage() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
+  const [location, setLocation] = useState("");
+  const [phone, setPhone] = useState(""); // ✅ NEW
   const [loading, setLoading] = useState(false);
 
   /* 🛒 ADD TO CART */
   function handleAddToCart() {
-    if (!name || !message || !email || !selectedPlant) {
+    if (!name || !message || !email || !location || !phone || !selectedPlant) {
       alert("Please fill all fields and select a plant");
       return;
     }
@@ -78,6 +80,8 @@ export default function BuyPage() {
       plantName: name,
       message,
       email,
+      location,
+      phone, // ✅ NEW
       price: selectedPlant.price,
       nameLabel: selectedPlant.name,
     });
@@ -90,7 +94,7 @@ export default function BuyPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!name || !message || !email || !selectedPlant) {
+    if (!name || !message || !email || !location || !phone || !selectedPlant) {
       alert("Please fill all fields and select a plant");
       return;
     }
@@ -106,6 +110,8 @@ export default function BuyPage() {
           name,
           message,
           email,
+          location,
+          phone, // ✅ NEW
           plant_type: plantType,
         }),
       });
@@ -162,7 +168,7 @@ export default function BuyPage() {
           router.push(`/result/${plantId}`);
         },
 
-        prefill: { email },
+        prefill: { email, contact: phone }, // ✅ NEW
         theme: { color: "#166534" },
       };
 
@@ -191,27 +197,20 @@ export default function BuyPage() {
           </p>
         )}
 
-        <input
-          placeholder="Plant name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          style={input}
-        />
+        <input placeholder="Plant name" value={name} onChange={(e) => setName(e.target.value)} required style={input} />
 
-        <textarea
-          placeholder="Memory message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          required
-          style={{ ...input, minHeight: 90 }}
-        />
+        <textarea placeholder="Memory message" value={message} onChange={(e) => setMessage(e.target.value)} required style={{ ...input, minHeight: 90 }} />
 
+        <input type="email" placeholder="Your email address" value={email} onChange={(e) => setEmail(e.target.value)} required style={input} />
+
+        <input placeholder="Delivery location" value={location} onChange={(e) => setLocation(e.target.value)} required style={input} />
+
+        {/* ✅ NEW PHONE INPUT */}
         <input
-          type="email"
-          placeholder="Your email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="tel"
+          placeholder="Phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           required
           style={input}
         />
@@ -220,12 +219,8 @@ export default function BuyPage() {
           Add to Cart 🛒
         </button>
 
-        <button
-         type="submit"
-         disabled={loading}
-         style={{ ...button, marginTop: 12 }}   // 👈 add this line
-        >
-         {loading ? "Processing..." : "Pay & Create Plant"}
+        <button type="submit" disabled={loading} style={{ ...button, marginTop: 12 }}>
+          {loading ? "Processing..." : "Pay & Create Plant"}
         </button>
       </form>
     </div>

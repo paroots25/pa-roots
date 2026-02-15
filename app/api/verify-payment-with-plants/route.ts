@@ -10,55 +10,70 @@ export async function POST(req: Request) {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      plantIds, // 👈 array of plant IDs from checkout
+      plantIds,
     } = body;
 
-    /* ---------------------------------- */
-    /* 1️⃣ VERIFY SIGNATURE */
-    /* ---------------------------------- */
+    /* 0️⃣ validation */
+    if (
+      !razorpay_order_id ||
+      !razorpay_payment_id ||
+      !razorpay_signature ||
+      !Array.isArray(plantIds) ||
+      plantIds.length === 0
+    ) {
+      console.log("❌ Missing payment fields", body);
+      return NextResponse.json(
+        { error: "Missing payment data" },
+        { status: 400 }
+      );
+    }
+
+    /* 1️⃣ verify signature */
     const secret = process.env.RAZORPAY_KEY_SECRET!;
 
-    const generatedSignature = crypto
+    const expectedSignature = crypto
       .createHmac("sha256", secret)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
 
-    if (generatedSignature !== razorpay_signature) {
+    console.log("🔍 Expected:", expectedSignature);
+    console.log("🔍 Razorpay :", razorpay_signature);
+
+    if (expectedSignature !== razorpay_signature) {
+      console.log("❌ Signature mismatch");
       return NextResponse.json(
         { error: "Invalid payment signature" },
         { status: 400 }
       );
     }
 
-    /* ---------------------------------- */
-    /* 2️⃣ MARK ALL PLANTS AS PAID */
-    /* ---------------------------------- */
+    /* 2️⃣ update plants as paid */
     const { error: updateError } = await supabase
       .from("plants")
-      .update({ payment_status: true })
-      .in("id", plantIds); // 👈 update multiple rows
+      .update({
+        payment_status: true,
+        razorpay_order_id,
+        razorpay_payment_id,
+      })
+      .in("id", plantIds);
 
     if (updateError) {
-      console.error("SUPABASE UPDATE ERROR:", updateError);
-
+      console.error("❌ Supabase update error:", updateError);
       return NextResponse.json(
-        { error: "Failed to update payment status" },
+        { error: "DB update failed" },
         { status: 500 }
       );
     }
 
-    /* ---------------------------------- */
-    /* 3️⃣ SUCCESS RESPONSE */
-    /* ---------------------------------- */
+    /* 3️⃣ success */
     return NextResponse.json({
       success: true,
-      firstPlantId: plantIds[0], // 👈 used for redirect to result page
+      firstPlantId: plantIds[0],
     });
-  } catch (error) {
-    console.error("VERIFY PAYMENT WITH PLANTS ERROR:", error);
-
+  } catch (err) {
+    console.error("❌ VERIFY ERROR:", err);
     return NextResponse.json(
-      { error: "Verification failed" },
+      { error: "Server verification failed" },
       { status: 500 }
     );
   }

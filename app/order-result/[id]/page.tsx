@@ -1,86 +1,59 @@
-"use client";
+import { supabase } from "@/lib/supabase";
 
-import { useParams } from "next/navigation";
-import { QRCodeCanvas } from "qrcode.react";
-import { useEffect, useState } from "react";
+export const dynamic = "force-dynamic";
 
-export default function AdminResultPage() {
-  const params = useParams();
-  const id = params.id as string;
+export default async function ResultPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = params;
 
-  const [links, setLinks] = useState<string[]>([]);
-
-  // ✅ Build memory links safely on client
-  useEffect(() => {
-    if (typeof window !== "undefined" && id) {
-      /**
-       * MULTI-QR LOGIC:
-       * If checkout stored multiple plant IDs → show all
-       * Otherwise → show single plant QR
-       */
-      const storedIds = sessionStorage.getItem("pa_roots_last_order");
-
-      if (storedIds) {
-        const ids: string[] = JSON.parse(storedIds);
-
-        const builtLinks = ids.map(
-          (plantId) => `${window.location.origin}/plant/${plantId}`
-        );
-
-        setLinks(builtLinks);
-
-        // clear after showing once
-        sessionStorage.removeItem("pa_roots_last_order");
-      } else {
-        // single plant fallback
-        setLinks([`${window.location.origin}/plant/${id}`]);
-      }
-    }
-  }, [id]);
+  /* 🌱 Get plant info */
+  const { data: plant } = await supabase
+    .from("plants")
+    .select("name, email")
+    .eq("id", id)
+    .maybeSingle();
 
   return (
     <div style={page}>
-      {/* 🌿 Title */}
-      <h1 style={title}>Plant QR Ready 🌱</h1>
+      <div style={card}>
+        {/* 🌿 Title */}
+        <h1 style={title}>Thank you for planting a memory 🌱</h1>
 
-      {/* ❤️ Emotional line */}
-      <p style={subtitle}>
-        This QR connects love to life.  
-        Place it near the plant and let memories grow forever.
-      </p>
+        {/* 💚 Subtitle */}
+        <p style={subtitle}>
+          Your order has been received successfully.
+        </p>
 
-      {/* 📱 QR Codes */}
-      <div style={{ marginTop: 30 }}>
-        {links.map((link, i) => (
-          <div key={i} style={{ marginBottom: 30 }}>
-            <QRCodeCanvas value={link} size={220} />
+        {/* 🌸 Personalized line */}
+        {plant?.name && (
+          <p style={plantLine}>
+            This memory plant is created for{" "}
+            <span style={highlight}>{plant.name}</span>
+          </p>
+        )}
 
-            {/* 🔗 CLICKABLE MEMORY LINK */}
-            <a href={link} target="_blank" style={linkStyle}>
-              {link}
-            </a>
-          </div>
-        ))}
+        {/* 📩 Email info */}
+         
+          <p style={info}>
+            Login details to personalize your memory will be sent to your registered Email
+            
+          </p>
+        
+
+        {/* 🏷 Physical QR note */}
+        <p style={info}>
+          Your QR code will be carefully printed and attached
+          to the plant before delivery 🌿
+        </p>
+
+        {/* ❤️ Closing line */}
+        <p style={footer}>
+          A living memory that will continue to grow with love.
+        </p>
       </div>
-
-      {/* 📩 Email instruction */}
-      <p style={emailNote}>
-        📩 Check your email to receive your plant login username and temporary
-        password.  
-        <br />
-        Please reply to the email with your delivery address so we can send your
-        living memory plant to you.
-        <br />
-        Kindly share the payment completion SS and your registered email to
-        WhatsApp number <b>8667794361</b> to get live updates of your plant.
-        <br />
-        Thank you!
-      </p>
-
-      {/* 🖨️ Print button */}
-      <button onClick={() => window.print()} style={printBtn}>
-        Print QR Sticker
-      </button>
     </div>
   );
 }
@@ -89,51 +62,59 @@ export default function AdminResultPage() {
 
 const page: React.CSSProperties = {
   minHeight: "100vh",
-  background: "#ecfdf5",
+  background: "linear-gradient(to bottom right, #ecfdf5, #f0fdf4)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  flexDirection: "column",
-  textAlign: "center",
   padding: 20,
+  fontFamily: "sans-serif",
+};
+
+const card: React.CSSProperties = {
+  background: "rgba(255,255,255,0.95)",
+  backdropFilter: "blur(12px)",
+  padding: "50px 40px",
+  borderRadius: 28,
+  maxWidth: 520,
+  width: "100%",
+  textAlign: "center",
+  boxShadow: "0 30px 70px rgba(0,0,0,0.15)",
 };
 
 const title: React.CSSProperties = {
   fontSize: 34,
   color: "#14532d",
+  marginBottom: 18,
+  fontWeight: "bold",
 };
 
 const subtitle: React.CSSProperties = {
-  marginTop: 10,
+  fontSize: 18,
   color: "#374151",
-  maxWidth: 420,
+  marginBottom: 20,
 };
 
-const linkStyle: React.CSSProperties = {
-  display: "block",
-  marginTop: 12,
-  fontWeight: "bold",
+const plantLine: React.CSSProperties = {
+  fontSize: 20,
+  marginBottom: 18,
+  color: "#14532d",
+};
+
+const info: React.CSSProperties = {
+  fontSize: 16,
+  color: "#4b5563",
+  marginBottom: 16,
+  lineHeight: 1.6,
+};
+
+const highlight: React.CSSProperties = {
   color: "#166534",
-  wordBreak: "break-all",
-  maxWidth: 420,
-  textDecoration: "underline",
+  fontWeight: "bold",
 };
 
-const emailNote: React.CSSProperties = {
-  marginTop: 20,
+const footer: React.CSSProperties = {
+  marginTop: 24,
   fontSize: 15,
-  color: "#374151",
-  maxWidth: 420,
-  lineHeight: 1.5,
-};
-
-const printBtn: React.CSSProperties = {
-  marginTop: 30,
-  padding: "12px 22px",
-  background: "#14532d",
-  color: "white",
-  border: "none",
-  borderRadius: 10,
-  cursor: "pointer",
-  fontSize: 15,
+  color: "#6b7280",
+  fontStyle: "italic",
 };

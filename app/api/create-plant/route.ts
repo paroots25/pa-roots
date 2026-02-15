@@ -6,9 +6,9 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("CREATE PLANT BODY:", body); // 🔍 debug
 
-    const { name, message, email, plant_type, } = body;
+    const { name, message, email, location, phone, plant_type, price } = body;
 
-    if (!name || !message || !email) {
+    if (!name || !message || !email || !location || !phone) {
       return NextResponse.json(
         { error: "Missing fields" },
         { status: 400 }
@@ -21,7 +21,11 @@ export async function POST(req: Request) {
         {
           name,
           message,
-          email, // ⭐ MUST be here
+          email,
+          location,      // ✅ NEW
+          phone,         // ✅ NEW
+          plant_type,    // ✅ NEW
+          price,         // ✅ NEW
           payment_status: false,
         },
       ])

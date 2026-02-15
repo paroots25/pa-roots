@@ -11,7 +11,7 @@ const razorpay = new Razorpay({
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { plants } = body;
+    const { plants, email, location, phone } = body; // ✅ added phone
 
     /* ❌ No plants */
     if (!plants || plants.length === 0) {
@@ -33,16 +33,18 @@ export async function POST(req: Request) {
 
     /* ---------------------------------- */
     /* 2️⃣ INSERT PLANTS INTO SUPABASE */
-    /* 🔥 IMPORTANT FIX: correct field names */
     /* ---------------------------------- */
     const { data: createdPlants, error: plantError } = await supabase
       .from("plants")
       .insert(
         plants.map((p: any) => ({
-          name: p.plantName,          // ✅ FIXED
+          name: p.plantName,                       // ✅ keep spelling
           message: p.message,
-          email: p.email,
+          email: p.email || email || "",
+          location: p.location || location || "",
+          phone: p.phone || phone || "",           // ✅ NEW
           plant_type: p.plant_type,
+          price: p.price,                          // ✅ IMPORTANT for revenue
           payment_status: false,
         }))
       )

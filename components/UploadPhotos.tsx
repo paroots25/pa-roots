@@ -15,8 +15,15 @@ export default function UploadPhotos({ plantId }: Props) {
     async function loadPhotos() {
       try {
         const res = await fetch(`/api/get-plant-photos?id=${plantId}`);
+
+        /* ❗ STOP JSON ERROR HERE */
+        if (!res.ok) return;
+
+        const contentType = res.headers.get("content-type");
+        if (!contentType?.includes("application/json")) return;
+
         const data = await res.json();
-        if (res.ok) setPhotos(data.photos || []);
+        setPhotos(data.photos || []);
       } catch (err) {
         console.error("LOAD PHOTOS ERROR:", err);
       }
@@ -45,11 +52,16 @@ export default function UploadPhotos({ plantId }: Props) {
         body: formData,
       });
 
-      const data = await res.json();
-
+      /* ❗ SAFE JSON PARSE */
       if (!res.ok) throw new Error("Upload failed");
 
-      setPhotos(data.photos);
+      const contentType = res.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error("Invalid server response");
+      }
+
+      const data = await res.json();
+      setPhotos(data.photos || []);
     } catch (err) {
       console.error("UPLOAD ERROR:", err);
       alert("Photo upload failed ❌");
@@ -69,11 +81,16 @@ export default function UploadPhotos({ plantId }: Props) {
         body: JSON.stringify({ id: plantId, url }),
       });
 
-      const data = await res.json();
-
+      /* ❗ SAFE JSON PARSE */
       if (!res.ok) throw new Error("Delete failed");
 
-      setPhotos(data.photos);
+      const contentType = res.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error("Invalid server response");
+      }
+
+      const data = await res.json();
+      setPhotos(data.photos || []);
     } catch (err) {
       console.error("DELETE ERROR:", err);
       alert("Delete failed ❌");
@@ -81,28 +98,51 @@ export default function UploadPhotos({ plantId }: Props) {
   }
 
   return (
-    <div style={wrap}>
-      <h2 style={title}>Upload Memory Photos 📸</h2>
+    <div style={{ marginTop: 30, textAlign: "center" }}>
+      <h2 style={{ fontSize: 22, color: "#14532d", marginBottom: 12 }}>
+        Upload Memory Photos 📸
+      </h2>
 
-      {/* Upload input */}
-      <input
-        type="file"
-        multiple
-        accept="image/*"
-        onChange={handleUpload}
-        style={input}
-      />
+      <input type="file" multiple accept="image/*" onChange={handleUpload} />
 
       {loading && <p style={{ marginTop: 10 }}>Uploading...</p>}
 
-      {/* Photo grid */}
-      <div style={grid}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+          gap: 12,
+          maxWidth: 500,
+          margin: "20px auto 0",
+        }}
+      >
         {photos.map((url, i) => (
-          <div key={i} style={photoCard}>
-            <img src={url} alt="plant" style={img} />
+          <div key={i} style={{ position: "relative" }}>
+            <img
+              src={url}
+              style={{
+                width: "100%",
+                height: 100,
+                objectFit: "cover",
+                borderRadius: 10,
+              }}
+            />
 
-            {/* 🔴 NEW DELETE BUTTON */}
-            <button onClick={() => handleDelete(url)} style={deleteBtn}>
+            <button
+              onClick={() => handleDelete(url)}
+              style={{
+                position: "absolute",
+                top: 4,
+                right: 4,
+                background: "#ef4444",
+                color: "white",
+                border: "none",
+                borderRadius: 8,
+                padding: "2px 6px",
+                fontSize: 12,
+                cursor: "pointer",
+              }}
+            >
               Delete
             </button>
           </div>
@@ -111,60 +151,3 @@ export default function UploadPhotos({ plantId }: Props) {
     </div>
   );
 }
-
-/* ---------- STYLES ---------- */
-
-const wrap: React.CSSProperties = {
-  marginTop: 30,
-  textAlign: "center",
-};
-
-const title: React.CSSProperties = {
-  fontSize: 22,
-  color: "#14532d",
-  marginBottom: 12,
-};
-
-const input: React.CSSProperties = {
-  marginBottom: 20,
-};
-
-const grid: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
-  gap: 12,
-  maxWidth: 500,
-  margin: "0 auto",
-};
-
-const photoCard: React.CSSProperties = {
-  position: "relative",
-};
-
-const img: React.CSSProperties = {
-  width: "100%",
-  height: 100,
-  objectFit: "cover",
-  borderRadius: 10,
-};
-
-/* 🔴 Always-visible delete pill */
-const deleteBtn: React.CSSProperties = {
-  position: "absolute",
-  top: 6,
-  right: 6,
-  background: "#ef4444",      // bright red
-  color: "white",
-  border: "none",
-  borderRadius: "50%",
-  width: 26,
-  height: 26,
-  cursor: "pointer",
-  fontSize: 16,
-  fontWeight: "bold",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 20,                 // 🔥 forces above image
-  boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-};

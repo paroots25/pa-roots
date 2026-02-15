@@ -1,25 +1,25 @@
 import { supabase } from "@/lib/supabase";
 import ShareButtons from "./ShareButtons";
-import UploadPhotos from "@/components/UploadPhotos"; // ✅ IMPORTANT
+import MemorySlideshow from "@/components/MemorySlideshow";
 
 export const dynamic = "force-dynamic";
 
 export default async function PlantPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>; // ✅ Next.js 15 type
 }) {
-  /* ✅ Await params properly */
+  /* ✅ unwrap params properly */
   const { id } = await params;
 
-  /* ✅ Fetch plant safely */
+  /* 🔍 fetch plant */
   const { data: plant, error } = await supabase
     .from("plants")
     .select("name, message, photos")
     .eq("id", id)
     .maybeSingle();
 
-  /* ❗ If still not found */
+  /* ❌ not found */
   if (!plant || error) {
     return (
       <div style={center}>
@@ -28,21 +28,16 @@ export default async function PlantPage({
     );
   }
 
-  /* ✅ Build memory link */
   const memoryLink = `${process.env.NEXT_PUBLIC_SITE_URL}/plant/${id}`;
 
   return (
     <div style={page}>
-      {/* 🌸 PHOTOS */}
+      {/* 🌸 Smooth slideshow */}
       {plant.photos?.length > 0 && (
-        <div style={topGallery}>
-          {plant.photos.map((url: string, i: number) => (
-            <img key={i} src={url} style={photo} />
-          ))}
-        </div>
+       <MemorySlideshow photos={plant.photos} />
       )}
 
-      {/* 🤍 MEMORY CARD */}
+      {/* 🤍 memory card */}
       <div style={card}>
         <h1 style={title}>{plant.name} 🌿</h1>
 
@@ -54,7 +49,7 @@ export default async function PlantPage({
 
         <ShareButtons memoryLink={memoryLink} />
 
-        {/* 🔥 THIS WAS MISSING — Upload + Delete UI */}
+        {/* upload photos */}
         
       </div>
     </div>
@@ -83,13 +78,11 @@ const topGallery: React.CSSProperties = {
 };
 
 const photo: React.CSSProperties = {
-  width: 160,
-  height: 120,
+  width: 220,
+  height: 160,
   objectFit: "cover",
   borderRadius: 16,
-  background: "white",
-  padding: 6,
-  boxShadow: "0 10px 25px rgba(0,0,0,0.10)",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
 };
 
 const card: React.CSSProperties = {
@@ -97,7 +90,7 @@ const card: React.CSSProperties = {
   backdropFilter: "blur(12px)",
   padding: 48,
   borderRadius: 28,
-  maxWidth: 480,
+  maxWidth: 520,
   width: "100%",
   textAlign: "center",
   boxShadow: "0 30px 70px rgba(0,0,0,0.18)",

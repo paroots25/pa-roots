@@ -31,7 +31,10 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           plants: cart,
+
+          /* ✅ ADDED — send email & location safely */
           email: cart[0]?.email || "",
+          location: cart[0]?.location || "",
         }),
       });
 
