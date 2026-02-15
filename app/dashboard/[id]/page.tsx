@@ -141,7 +141,7 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* PHOTO GRID WITH DELETE */}
+        {/* PHOTO GRID */}
         {photos.length > 0 && (
           <div style={photoGrid}>
             {photos.map((url, i) => (
@@ -159,9 +159,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* QR + LINK */}
-        <div style={{ marginTop: 30 }}>
-          {/* ✅ FIXED → opens QR page instead of memory page */}
+        {/* QR + LINK (✅ FIXED SPACING) */}
+        <div style={qrSection}>
           <button
             onClick={() => window.open(`/qr/${id}`, "_blank")}
             style={qrBtn}
@@ -169,7 +168,16 @@ export default function DashboardPage() {
             View QR Code 🌿
           </button>
 
-          {memoryLink && <p style={linkText}>{memoryLink}</p>}
+          {memoryLink && (
+            <a
+              href={memoryLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={linkText}
+            >
+              {memoryLink}
+            </a>
+          )}
         </div>
       </div>
     </div>
@@ -262,6 +270,15 @@ const deleteBtn: React.CSSProperties = {
   cursor: "pointer",
 };
 
+/* ✅ NEW: proper vertical spacing */
+const qrSection: React.CSSProperties = {
+  marginTop: 30,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 12,
+};
+
 const qrBtn: React.CSSProperties = {
   padding: "12px 22px",
   background: "#14532d",
@@ -272,8 +289,8 @@ const qrBtn: React.CSSProperties = {
 };
 
 const linkText: React.CSSProperties = {
-  marginTop: 12,
   color: "#166534",
   fontWeight: "bold",
   wordBreak: "break-all",
+  textDecoration: "none",
 };
