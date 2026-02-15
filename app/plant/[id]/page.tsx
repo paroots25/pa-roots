@@ -80,7 +80,7 @@ const topGallery: React.CSSProperties = {
 const photo: React.CSSProperties = {
   width: 220,
   height: 160,
-  objectFit: "cover",
+  objectFit: "contain",
   borderRadius: 16,
   boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
 };
