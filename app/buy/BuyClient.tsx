@@ -176,12 +176,16 @@ export default function BuyPage() {
         <p style={costInfo}>
           All costs including packaging & shipping are already included.
           No extra charges needed.
+          Free Pots are included.
         </p>
+        
 
         {selectedPlant && (
           <p style={selectedPlantText}>
             {selectedPlant.name} — ₹{selectedPlant.price}
           </p>
+
+          
         )}
 
         <input
