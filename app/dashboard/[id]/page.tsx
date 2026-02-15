@@ -163,7 +163,7 @@ export default function DashboardPage() {
         <div style={{ marginTop: 30 }}>
           {/* ✅ FIXED → opens QR page instead of memory page */}
           <button
-            onClick={() => window.open(`/qr/${id}`, "_blank")}
+            onClick={() => window.open(`admin/qr/${id}`, "_blank")}
             style={qrBtn}
           >
             View QR Code 🌿
