@@ -36,12 +36,13 @@ export default async function ResultPage({
         )}
 
         {/* 📩 Email info */}
-         
+        {plant?.email && (
           <p style={info}>
-            Login details to personalize your memory will be sent to your registered Email
-            
+            Login details to personalize your memory will be sent to
+            <br />
+            <span style={highlight}>{plant.email}</span>
           </p>
-        
+        )}
 
         {/* 🏷 Physical QR note */}
         <p style={info}>

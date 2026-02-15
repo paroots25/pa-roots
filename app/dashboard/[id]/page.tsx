@@ -163,7 +163,7 @@ export default function DashboardPage() {
         {/* QR + LINK */}
         <div style={{ marginTop: 30 }}>
           <button
-            onClick={() => window.open(`/result/${id}`, "_blank")}
+            onClick={() => window.open(`/plant/${id}`, "_blank")}
             style={qrBtn}
           >
             View QR Code 🌿

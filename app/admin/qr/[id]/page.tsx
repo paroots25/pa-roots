@@ -31,11 +31,20 @@ export default function AdminQRPage() {
         </div>
       )}
 
-      {link && (
-        <p style={linkText}>
-          {link}
-        </p>
-      )}
+      <a
+        href={link}
+        target="_blank"
+        style={{
+          display: "block",
+          marginTop: 12,
+          fontWeight: "bold",
+          color: "#166534",
+          wordBreak: "break-all",
+          textDecoration: "underline",
+        }}
+     >
+        Open Memory Page 🌿
+     </a>
 
       <button onClick={() => window.print()} style={printBtn}>
         Print QR Sticker 🖨️
