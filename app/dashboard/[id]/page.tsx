@@ -148,7 +148,6 @@ export default function DashboardPage() {
               <div key={i} style={photoWrap}>
                 <img src={url} style={photo} />
 
-                {/* DELETE BUTTON */}
                 <button
                   onClick={() => handleDeletePhoto(url)}
                   style={deleteBtn}
@@ -162,8 +161,9 @@ export default function DashboardPage() {
 
         {/* QR + LINK */}
         <div style={{ marginTop: 30 }}>
+          {/* ✅ FIXED → opens QR page instead of memory page */}
           <button
-            onClick={() => window.open(`/plant/${id}`, "_blank")}
+            onClick={() => window.open(`/qr/${id}`, "_blank")}
             style={qrBtn}
           >
             View QR Code 🌿
