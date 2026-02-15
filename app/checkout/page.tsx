@@ -31,8 +31,6 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           plants: cart,
-
-          /* ✅ ADDED — send email & location safely */
           email: cart[0]?.email || "",
           location: cart[0]?.location || "",
         }),
@@ -64,8 +62,8 @@ export default function CheckoutPage() {
         description: "Memory Plants Checkout",
         order_id: order.id,
 
+        /* ⭐ DESKTOP SUCCESS HANDLER */
         handler: async function (response: any) {
-          /* 4️⃣ Verify payment for MULTIPLE plants */
           const verifyRes = await fetch("/api/verify-payment-with-plants", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -82,18 +80,21 @@ export default function CheckoutPage() {
             return;
           }
 
-          /* ✅ SAVE IDS FOR MULTI-QR RESULT PAGE */
+          /* save order ids */
           sessionStorage.setItem(
             "pa_roots_last_order",
             JSON.stringify(plantIds)
           );
 
-          /* 🧹 Clear cart */
+          /* clear cart */
           localStorage.removeItem("pa_roots_cart");
 
-          /* 🚀 Redirect to multi-order result */
+          /* redirect */
           router.push(`/order-result/${plantIds[0]}`);
         },
+
+        /* ⭐ CRITICAL FIX FOR MOBILE UPI REDIRECT */
+        callback_url: `${window.location.origin}/order-success`,
 
         theme: { color: "#166534" },
       };
