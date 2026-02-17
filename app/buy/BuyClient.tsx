@@ -17,7 +17,7 @@ export default function BuyPage() {
     "white-princess": { name: "Philodendron White Princess", price: 1099 },
     "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 449 },
     "peperomia-silver": { name: "Peperomia Silver Ripple", price: 449 },
-    "christmas-cactus": { name: "Christmas Cactus", price: 699 },
+    "christmas-cactus": { name: "Christmas Cactus", price: 1 },
     ZZZ: { name: "Zamioculcas(ZZ)", price: 799 },
     zz: { name: "Zamioculcas(ZZ) Premium", price: 1299 },
     "Imperial-Green": { name: "Imperial Green", price: 849 },
