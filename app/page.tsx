@@ -1,6 +1,27 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 
 export default function HomePage() {
+
+  useEffect(() => {
+    const elements = document.querySelectorAll(".fade-in");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("show");
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+  }, []);
+
   return (
     <div
       style={{
@@ -52,6 +73,8 @@ export default function HomePage() {
       </div>
 
       {/* 🌿 WHAT IS PA ROOTS */}
+    <div className="fade-in">
+    
       <Section>
         <h2 style={sectionTitle}>What is PA Roots?</h2>
 
@@ -70,6 +93,7 @@ export default function HomePage() {
           The memory stays forever.
         </p>
       </Section>
+    </div>
 
       {/* 🌿 HOW IT WORKS (Legacy Theme Style) */}
       <div style={legacySection}>
@@ -92,6 +116,7 @@ export default function HomePage() {
       </div>
 
       {/* 🌿 UNIQUE SECTION */}
+    <div className="fade-in">
       <Section>
         <h2 style={sectionTitle}>What is Unique in PA Roots?</h2>
 
@@ -109,6 +134,55 @@ export default function HomePage() {
           A memory… planted.
         </h3>
       </Section>
+    </div>
+
+    {/* 🌿 BULK ORDERS SECTION */}
+<div
+  style={{
+    marginTop: 120,
+    background: "#f8f4e8",
+    padding: "80px 30px",
+    borderRadius: 30,
+    textAlign: "center",
+  }}
+>
+  <h2 style={{ fontSize: 34, color: "#14532d" }}>
+    Planning a Bulk Order?
+  </h2>
+
+  <p
+    style={{
+      marginTop: 20,
+      fontSize: 17,
+      color: "#374151",
+      maxWidth: 700,
+      marginInline: "auto",
+    }}
+  >
+    Perfect for corporate gifting, weddings, college events,
+    return gifts, and special occasions.
+    <br />
+    Get customized Memory Plants with branding,
+    personalized tags, and QR memory pages.
+  </p>
+
+  <Link href="/bulk-orders">
+    <button
+      style={{
+        marginTop: 30,
+        padding: "14px 30px",
+        fontSize: 16,
+        borderRadius: 14,
+        border: "none",
+        background: "#166534",
+        color: "white",
+        cursor: "pointer",
+      }}
+    >
+      Request Bulk Quote 🌱
+    </button>
+  </Link>
+</div>
 
       {/* 🌱 CTA */}
       <div style={{ textAlign: "center", marginTop: 100, marginBottom: 80 }}>
