@@ -18,7 +18,7 @@ export default function BuyPage() {
     "peperomia-lime": { name: "Peperomia Obtusifolia Lime", price: 449 },
     "peperomia-silver": { name: "Peperomia Silver Ripple", price: 449 },
     "christmas-cactus": { name: "Christmas Cactus", price: 699 },
-    ZZZ: { name: "Zamioculcas(ZZ)", price: 2000 },
+    ZZZ: { name: "Zamioculcas(ZZ)", price: 1 },
     zz: { name: "Zamioculcas(ZZ) Premium", price: 1299 },
     "Imperial-Green": { name: "Imperial Green", price: 849 },
     "Aglaonema-Thai": { name: "Aglaonema Thai", price: 1399 },
