@@ -19,8 +19,8 @@ export default function MemoryModal({
       </button>
 
       {open && (
-        <div style={overlay} onClick={() => setOpen(false)}>
-          <div style={modal} onClick={(e) => e.stopPropagation()}>
+        <div style={wrapper}>
+          <div style={modal}>
 
             {/* Top Bar */}
             <div style={topBar}>
@@ -32,7 +32,7 @@ export default function MemoryModal({
               </button>
             </div>
 
-            {/* Image Area */}
+            {/* Image */}
             <div style={imageFrame}>
               <MemorySlideshow photos={photos} />
             </div>
@@ -55,40 +55,39 @@ const viewButton: React.CSSProperties = {
   cursor: "pointer",
 };
 
-/* 🔥 FIXED OVERLAY (MOBILE SAFE) */
-const overlay: React.CSSProperties = {
+/* ✅ Wrapper WITHOUT black background */
+const wrapper: React.CSSProperties = {
   position: "fixed",
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: "#000",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   zIndex: 9999,
+  pointerEvents: "auto",
 };
 
-/* 🔥 BIGGER MODAL */
+/* ✅ Only this black box remains */
 const modal: React.CSSProperties = {
   width: "95%",
   maxWidth: "1400px",
-  height: "92vh",
+  height: "90vh",
   background: "black",
   borderRadius: 24,
   display: "flex",
   flexDirection: "column",
   overflow: "hidden",
+  boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
 };
 
-/* Top Bar */
 const topBar: React.CSSProperties = {
   height: 80,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   padding: "0 30px",
-  background: "black",
 };
 
 const topNote: React.CSSProperties = {
@@ -108,12 +107,10 @@ const closeBtn: React.CSSProperties = {
   cursor: "pointer",
 };
 
-/* Image Container */
 const imageFrame: React.CSSProperties = {
   flex: 1,
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   padding: "30px",
-  background: "black",
 };
