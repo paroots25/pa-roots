@@ -2,76 +2,62 @@
 
 import { useEffect, useState } from "react";
 
-export default function MemorySlideshow({ photos }: { photos: string[] }) {
+export default function MemorySlideshow({
+  photos,
+}: {
+  photos: string[];
+}) {
   const [index, setIndex] = useState(0);
 
-  /* change photo every 4 sec */
   useEffect(() => {
-    if (!photos?.length) return;
+    if (!photos || photos.length === 0) return;
 
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % photos.length);
-    }, 4000);
+    const interval = setInterval(() => {
+      setIndex((prev) =>
+        prev === photos.length - 1 ? 0 : prev + 1
+      );
+    }, 2000); // 2 seconds per image
 
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, [photos]);
 
-  if (!photos?.length) return null;
+  if (!photos || photos.length === 0) return null;
 
   return (
-    <div style={wrapper}>
-      <div
-        key={index}
-        style={slide}
-      >
-        <img src={photos[index]} style={image} />
-      </div>
+    <div style={container}>
+      {photos.map((photo, i) => (
+        <img
+          key={i}
+          src={photo}
+          alt="memory"
+          style={{
+            ...image,
+            opacity: i === index ? 1 : 0,
+            transform: i === index ? "scale(1.06)" : "scale(1)",
+            zIndex: i === index ? 1 : 0,
+          }}
+        />
+      ))}
     </div>
   );
 }
 
-/* ---------- styles ---------- */
+/* ---------- Styles ---------- */
 
-/* outer fixed area */
-const wrapper: React.CSSProperties = {
-  width: "100%",
-  height: 180,
-  overflow: "hidden",
+const container: React.CSSProperties = {
   position: "relative",
-  marginBottom: 30,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+  width: "100%",
+  height: "100%",
+  overflow: "hidden",
+  background: "black", // prevents any white gap
 };
 
-/* moving slide animation */
-const slide: React.CSSProperties = {
-  position: "absolute",
-  animation: "slideAcross 4s linear",
-};
-
-/* image style (SMALL PHOTO like you asked) */
 const image: React.CSSProperties = {
-  height: 160,
-  width: 220,
-  objectFit: "contain",        // ✅ show full image
-  borderRadius: 16,
-  background: "#f0fdf4",       // ✅ soft light green fill
-  padding: 8,                  // ✅ breathing space
-  boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  objectFit: "contain", // 🔥 THIS is the key change
+  transition: "opacity 0.8s ease-in-out",
+  background: "black",
 };
-
-/* keyframes via global style injection */
-if (typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.innerHTML = `
-    @keyframes slideAcross {
-      0%   { transform: translateX(-120%); opacity: 0; }
-      10%  { opacity: 1; }
-      50%  { transform: translateX(0%); }
-      90%  { opacity: 1; }
-      100% { transform: translateX(120%); opacity: 0; }
-    }
-  `;
-  document.head.appendChild(style);
-}
