@@ -22,7 +22,7 @@ export default function MemoryModal({
         <div style={overlay} onClick={() => setOpen(false)}>
           <div style={modal} onClick={(e) => e.stopPropagation()}>
 
-            {/* 🔝 Top Bar */}
+            {/* Top Bar */}
             <div style={topBar}>
               <p style={topNote}>
                 A memory planted with love 🌱
@@ -32,7 +32,7 @@ export default function MemoryModal({
               </button>
             </div>
 
-            {/* 🖼 Image Frame */}
+            {/* Image Area */}
             <div style={imageFrame}>
               <MemorySlideshow photos={photos} />
             </div>
@@ -55,21 +55,25 @@ const viewButton: React.CSSProperties = {
   cursor: "pointer",
 };
 
+/* 🔥 FIXED OVERLAY (MOBILE SAFE) */
 const overlay: React.CSSProperties = {
   position: "fixed",
-  inset: 0,
-  width: "40vw",
-  height: "90vh",
-  background: "rgba(0,0,0,0.96)",  // darker full screen
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "#000",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  zIndex: 1000,
+  zIndex: 9999,
 };
+
+/* 🔥 BIGGER MODAL */
 const modal: React.CSSProperties = {
-  width: "96%",
-  maxWidth: 1200,          // good for laptop
-  height: "88vh",          // slightly taller
+  width: "95%",
+  maxWidth: "1400px",
+  height: "92vh",
   background: "black",
   borderRadius: 24,
   display: "flex",
@@ -77,12 +81,13 @@ const modal: React.CSSProperties = {
   overflow: "hidden",
 };
 
+/* Top Bar */
 const topBar: React.CSSProperties = {
-  height: 80,              // slightly taller header
+  height: 80,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "0 40px",
+  padding: "0 30px",
   background: "black",
 };
 
@@ -103,11 +108,12 @@ const closeBtn: React.CSSProperties = {
   cursor: "pointer",
 };
 
+/* Image Container */
 const imageFrame: React.CSSProperties = {
   flex: 1,
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  padding: "50px",     // 🔥 creates cinematic black border
+  padding: "30px",
   background: "black",
 };
