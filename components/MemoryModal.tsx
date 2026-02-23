@@ -22,19 +22,18 @@ export default function MemoryModal({
         <div style={overlay} onClick={() => setOpen(false)}>
           <div style={modal} onClick={(e) => e.stopPropagation()}>
 
-            {/* 🔥 Top Header Bar */}
+            {/* 🔝 Top Bar */}
             <div style={topBar}>
-              <span style={noteText}>
+              <p style={topNote}>
                 A memory planted with love 🌱
-              </span>
-
+              </p>
               <button style={closeBtn} onClick={() => setOpen(false)}>
                 ✕
               </button>
             </div>
 
-            {/* 🔥 Slideshow Below Header */}
-            <div style={slideshowArea}>
+            {/* 🖼 Image Frame */}
+            <div style={imageFrame}>
               <MemorySlideshow photos={photos} />
             </div>
 
@@ -53,65 +52,62 @@ const viewButton: React.CSSProperties = {
   color: "white",
   border: "none",
   borderRadius: 16,
-  fontWeight: 600,
   cursor: "pointer",
-  marginBottom: 30,
-  fontSize: 16,
 };
 
 const overlay: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0,0,0,0.95)",
+  width: "40vw",
+  height: "90vh",
+  background: "rgba(0,0,0,0.96)",  // darker full screen
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   zIndex: 1000,
 };
-
 const modal: React.CSSProperties = {
-  width: "95%",
-  maxWidth: "1200px",
-  aspectRatio: "16 / 9",
+  width: "96%",
+  maxWidth: 1200,          // good for laptop
+  height: "88vh",          // slightly taller
   background: "black",
-  borderRadius: 20,
+  borderRadius: 24,
   display: "flex",
   flexDirection: "column",
   overflow: "hidden",
 };
 
-/* 🔥 TOP BLACK BAR */
 const topBar: React.CSSProperties = {
-  height: "70px",
+  height: 80,              // slightly taller header
   display: "flex",
+  justifyContent: "space-between",
   alignItems: "center",
-  justifyContent: "center",
-  position: "relative",
+  padding: "0 40px",
   background: "black",
 };
 
-/* 🔥 TEXT */
-const noteText: React.CSSProperties = {
+const topNote: React.CSSProperties = {
   color: "white",
-  fontSize: 15,
-  opacity: 0.9,
+  margin: 0,
+  fontSize: 18,
+  fontWeight: 500,
 };
 
-/* 🔥 CLOSE BUTTON */
 const closeBtn: React.CSSProperties = {
-  position: "absolute",
-  right: 20,
   background: "rgba(255,255,255,0.15)",
   border: "none",
   color: "white",
-  fontSize: 18,
-  padding: "6px 12px",
-  borderRadius: 8,
+  fontSize: 20,
+  padding: "8px 14px",
+  borderRadius: 10,
   cursor: "pointer",
 };
 
-/* 🔥 SLIDESHOW AREA BELOW HEADER */
-const slideshowArea: React.CSSProperties = {
+const imageFrame: React.CSSProperties = {
   flex: 1,
-  position: "relative",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: "50px",     // 🔥 creates cinematic black border
+  background: "black",
 };
