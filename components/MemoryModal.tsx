@@ -5,8 +5,12 @@ import MemorySlideshow from "./MemorySlideshow";
 
 export default function MemoryModal({
   photos,
+  audioUrl,
+  audioMode,
 }: {
   photos: string[];
+  audioUrl?: string;
+  audioMode?: "manual" | "auto";
 }) {
   const [open, setOpen] = useState(false);
 
@@ -19,10 +23,10 @@ export default function MemoryModal({
       </button>
 
       {open && (
-        <div style={wrapper}>
-          <div style={modal}>
+        <div style={overlay} onClick={() => setOpen(false)}>
+          <div style={modal} onClick={(e) => e.stopPropagation()}>
 
-            {/* Top Bar */}
+            {/* 🔝 Top Bar */}
             <div style={topBar}>
               <p style={topNote}>
                 A memory planted with love 🌱
@@ -32,9 +36,13 @@ export default function MemoryModal({
               </button>
             </div>
 
-            {/* Image */}
+            {/* 🖼 Image Frame */}
             <div style={imageFrame}>
-              <MemorySlideshow photos={photos} />
+              <MemorySlideshow
+                photos={photos}
+                audioUrl={audioUrl || undefined}
+                audioMode={audioMode || undefined}
+              />
             </div>
 
           </div>
@@ -44,7 +52,7 @@ export default function MemoryModal({
   );
 }
 
-/* ---------- Styles ---------- */
+/* ---------- Styles (UNCHANGED) ---------- */
 
 const viewButton: React.CSSProperties = {
   padding: "14px 28px",
@@ -55,46 +63,39 @@ const viewButton: React.CSSProperties = {
   cursor: "pointer",
 };
 
-/* ✅ Wrapper WITHOUT black background */
-const wrapper: React.CSSProperties = {
+const overlay: React.CSSProperties = {
   position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
+  inset: 0,
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  zIndex: 9999,
-  pointerEvents: "auto",
+  zIndex: 1000,
 };
 
-/* ✅ Only this black box remains */
 const modal: React.CSSProperties = {
-  width: "95%",
-  maxWidth: "1400px",
-  height: "90vh",
+  width: "92%",
+  maxWidth: 1300,
+  height: "85vh",
   background: "black",
-  borderRadius: 24,
+  borderRadius: 20,
   display: "flex",
   flexDirection: "column",
   overflow: "hidden",
-  boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
 };
 
 const topBar: React.CSSProperties = {
-  height: 80,
+  height: 70,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   padding: "0 30px",
+  background: "black",
 };
 
 const topNote: React.CSSProperties = {
   color: "white",
   margin: 0,
-  fontSize: 18,
-  fontWeight: 500,
+  fontSize: 16,
 };
 
 const closeBtn: React.CSSProperties = {
@@ -102,8 +103,8 @@ const closeBtn: React.CSSProperties = {
   border: "none",
   color: "white",
   fontSize: 20,
-  padding: "8px 14px",
-  borderRadius: 10,
+  padding: "6px 12px",
+  borderRadius: 8,
   cursor: "pointer",
 };
 
@@ -112,5 +113,6 @@ const imageFrame: React.CSSProperties = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  padding: "30px",
+  padding: "40px",
+  background: "black",
 };

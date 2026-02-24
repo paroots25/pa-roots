@@ -10,8 +10,18 @@ export default function DashboardPage() {
   const [message, setMessage] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [files, setFiles] = useState<FileList | null>(null);
+
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioUrl, setAudioUrl] = useState("");
+  const [audioMode, setAudioMode] = useState<"manual" | "auto">("manual");
+
   const [memoryLink, setMemoryLink] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "message" | "images" | "audio" | "qr"
+  >("message");
 
   /* ---------------- LOAD PLANT ---------------- */
   useEffect(() => {
@@ -22,19 +32,20 @@ export default function DashboardPage() {
       if (data.plant) {
         setMessage(data.plant.message || "");
         setPhotos(data.plant.photos || []);
+        setAudioUrl(data.plant.audio_url || "");
+        setAudioMode(data.plant.audio_mode || "manual");
       }
     }
 
     if (id) loadPlant();
   }, [id]);
 
-  /* ---------------- BUILD MEMORY LINK ---------------- */
+  /* ---------------- MEMORY LINK ---------------- */
   useEffect(() => {
     if (id) {
-      const baseUrl =
+      const base =
         process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-
-      setMemoryLink(`${baseUrl}/plant/${id}`);
+      setMemoryLink(`${base}/plant/${id}`);
     }
   }, [id]);
 
@@ -42,33 +53,28 @@ export default function DashboardPage() {
   async function handleSaveMessage() {
     setLoading(true);
 
-    const res = await fetch("/api/update-plant", {
+    await fetch("/api/update-plant", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, message }),
     });
 
     setLoading(false);
-
-    if (!res.ok) alert("Failed to save ❌");
-    else alert("Memory saved 🌱");
+    alert("Memory saved 🌱");
   }
 
   /* ---------------- UPLOAD PHOTOS ---------------- */
   async function handleUploadPhotos() {
-    if (!files || files.length === 0) {
-      alert("Select photos first 📸");
-      return;
-    }
+    if (!files) return;
 
     setLoading(true);
 
     const formData = new FormData();
     formData.append("id", id);
 
-    Array.from(files).forEach((file) => {
-      formData.append("files", file);
-    });
+    Array.from(files).forEach((file) =>
+      formData.append("files", file)
+    );
 
     const res = await fetch("/api/upload-photo", {
       method: "POST",
@@ -76,111 +82,263 @@ export default function DashboardPage() {
     });
 
     const data = await res.json();
+    setPhotos(data.photos || []);
     setLoading(false);
-
-    if (!res.ok) {
-      alert("Upload failed ❌");
-    } else {
-      setPhotos(data.photos || []);
-      alert("Photos uploaded 🌸");
-    }
   }
 
-  /* ---------------- DELETE PHOTO ---------------- */
-  async function handleDeletePhoto(url: string) {
+  /* ---------------- DELETE PHOTO (NEW) ---------------- */
+  async function handleDeletePhoto(photoUrl: string) {
     if (!confirm("Delete this photo?")) return;
 
-    setLoading(true);
+    const fileName = photoUrl.split("/").pop();
 
     const res = await fetch("/api/delete-photo", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, url }),
+      body: JSON.stringify({
+        id,
+        fileName,
+      }),
+    });
+
+    if (!res.ok) {
+      alert("Delete failed ❌");
+    } else {
+      setPhotos((prev) => prev.filter((p) => p !== photoUrl));
+      alert("Photo deleted 🗑️");
+    }
+  }
+
+  /* ---------------- UPLOAD AUDIO ---------------- */
+  async function handleUploadAudio() {
+    if (!audioFile) {
+      alert("Select audio first 🎵");
+      return;
+    }
+
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("audio", audioFile);
+    formData.append("mode", audioMode);
+
+    const res = await fetch("/api/upload-audio", {
+      method: "POST",
+      body: formData,
     });
 
     const data = await res.json();
     setLoading(false);
 
+    if (!res.ok) alert("Upload failed ❌");
+    else {
+      setAudioUrl(data.audioUrl);
+      alert("Audio uploaded 🎶");
+    }
+  }
+
+  /* ---------------- DELETE AUDIO ---------------- */
+  async function handleDeleteAudio() {
+    if (!audioUrl) return;
+
+    if (!confirm("Delete this audio?")) return;
+
+    const fileName = audioUrl.split("/").pop();
+
+    const res = await fetch("/api/delete-audio", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        fileName,
+      }),
+    });
+
     if (!res.ok) {
       alert("Delete failed ❌");
     } else {
-      setPhotos(data.photos || []);
+      setAudioUrl("");
+      setAudioFile(null);
+      alert("Audio deleted 🎵");
     }
   }
 
   /* ---------------- UI ---------------- */
   return (
     <div style={page}>
-      <div style={card}>
-        <h1 style={title}>Plant Dashboard 🌱</h1>
-
-        {/* MESSAGE */}
-        <textarea
-          placeholder="Write your memory..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          style={textarea}
-        />
-
-        <button onClick={handleSaveMessage} disabled={loading} style={saveBtn}>
-          {loading ? "Saving..." : "Save Memory"}
+      <div style={topBar}>
+        <button style={hamburger} onClick={() => setSidebarOpen(true)}>
+          ☰
         </button>
+        <h2 style={{ margin: 0 }}>Plant Dashboard 🌱</h2>
+      </div>
 
-        {/* PHOTO UPLOAD */}
-        <div style={{ marginTop: 20 }}>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={(e) => setFiles(e.target.files)}
-          />
+      <div style={contentWrapper}>
+        <div style={card}>
+          {activeTab === "message" && (
+            <>
+              <textarea
+                placeholder="Write your memory..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                style={textarea}
+              />
+              <button style={btn} onClick={handleSaveMessage}>
+                {loading ? "Saving..." : "Save Memory"}
+              </button>
+            </>
+          )}
 
-          <button
-            onClick={handleUploadPhotos}
-            disabled={loading}
-            style={uploadBtn}
-          >
-            {loading ? "Uploading..." : "Upload Photos"}
-          </button>
+          {activeTab === "images" && (
+            <>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={(e) => setFiles(e.target.files)}
+              />
+              <button style={btn} onClick={handleUploadPhotos}>
+                Upload Photos
+              </button>
+
+              <div style={photoGrid}>
+                {photos.map((url, i) => (
+                  <div key={i} style={{ position: "relative" }}>
+                    <img src={url} style={photo} />
+                    <button
+                      onClick={() => handleDeletePhoto(url)}
+                      style={{
+                        position: "absolute",
+                        top: 6,
+                        right: 6,
+                        background: "rgba(0,0,0,0.6)",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: 24,
+                        height: 24,
+                        cursor: "pointer",
+                        fontSize: 14,
+                        lineHeight: "24px",
+                        textAlign: "center",
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {activeTab === "audio" && (
+            <>
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={(e) =>
+                  setAudioFile(e.target.files?.[0] || null)
+                }
+              />
+
+              <div style={radioContainer}>
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={audioMode === "manual"}
+                    onChange={() => setAudioMode("manual")}
+                  />
+                  Play only when clicked ▶️
+                </label>
+
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={audioMode === "auto"}
+                    onChange={() => setAudioMode("auto")}
+                  />
+                  Auto play with slideshow 🔁
+                </label>
+              </div>
+
+              <button style={btn} onClick={handleUploadAudio}>
+                Upload Audio
+              </button>
+
+              {audioUrl && (
+                <>
+                  <audio
+                    controls
+                    src={audioUrl}
+                    style={{ marginTop: 20, width: "100%" }}
+                  />
+
+                  <button
+                    style={{
+                      ...btn,
+                      background: "#dc2626",
+                      marginTop: 15,
+                    }}
+                    onClick={handleDeleteAudio}
+                  >
+                    Delete Audio ❌
+                  </button>
+                </>
+              )}
+            </>
+          )}
+
+          {activeTab === "qr" && (
+            <>
+              <button
+                style={btn}
+                onClick={() => window.open(`/qr/${id}`, "_blank")}
+              >
+                View QR Code 🌿
+              </button>
+
+              <a
+                href={memoryLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={linkText}
+              >
+                {memoryLink}
+              </a>
+            </>
+          )}
+        </div>
+      </div>
+
+      {sidebarOpen && (
+        <div style={overlay} onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <div
+        style={{
+          ...sidebar,
+          transform: sidebarOpen
+            ? "translateX(0)"
+            : "translateX(-100%)",
+        }}
+      >
+        <h3>Customize 🌿</h3>
+
+        <div style={menuItem} onClick={() => { setActiveTab("message"); setSidebarOpen(false); }}>
+          📝 Message
         </div>
 
-        {/* PHOTO GRID */}
-        {photos.length > 0 && (
-          <div style={photoGrid}>
-            {photos.map((url, i) => (
-              <div key={i} style={photoWrap}>
-                <img src={url} style={photo} />
+        <div style={menuItem} onClick={() => { setActiveTab("images"); setSidebarOpen(false); }}>
+          🖼 Images
+        </div>
 
-                <button
-                  onClick={() => handleDeletePhoto(url)}
-                  style={deleteBtn}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        <div style={menuItem} onClick={() => { setActiveTab("audio"); setSidebarOpen(false); }}>
+          🎵 Audio
+        </div>
 
-        {/* QR + LINK (✅ FIXED SPACING) */}
-        <div style={qrSection}>
-          <button
-            onClick={() => window.open(`/qr/${id}`, "_blank")}
-            style={qrBtn}
-          >
-            View QR Code 🌿
-          </button>
-
-          {memoryLink && (
-            <a
-              href={memoryLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={linkText}
-            >
-              {memoryLink}
-            </a>
-          )}
+        <div style={menuItem} onClick={() => { setActiveTab("qr"); setSidebarOpen(false); }}>
+          🔗 QR & Link
         </div>
       </div>
     </div>
@@ -191,51 +349,55 @@ export default function DashboardPage() {
 
 const page: React.CSSProperties = {
   minHeight: "100vh",
-  background: "linear-gradient(to bottom right, #ecfdf5, #f0fdf4)",
+  background: "#f0fdf4",
+};
+
+const topBar: React.CSSProperties = {
+  height: 70,
+  backgroundColor: "#166534",
+  color: "white",
+  display: "flex",
+  alignItems: "center",
+  gap: 20,
+  padding: "0 20px",
+};
+
+const hamburger: React.CSSProperties = {
+  fontSize: 24,
+  backgroundColor: "transparent",
+  border: "none",
+  color: "white",
+  cursor: "pointer",
+};
+
+const contentWrapper: React.CSSProperties = {
   display: "flex",
   justifyContent: "center",
-  alignItems: "center",
-  padding: 20,
+  padding: "40px 20px",
 };
 
 const card: React.CSSProperties = {
-  background: "white",
+  width: "100%",
+  maxWidth: 600,
+  backgroundColor: "white",
   padding: 30,
   borderRadius: 20,
-  width: "100%",
-  maxWidth: 520,
-  textAlign: "center",
-  boxShadow: "0 15px 40px rgba(0,0,0,0.08)",
-};
-
-const title: React.CSSProperties = {
-  fontSize: 30,
-  color: "#14532d",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
 };
 
 const textarea: React.CSSProperties = {
   width: "100%",
   height: 120,
-  marginTop: 20,
   padding: 12,
   borderRadius: 10,
   border: "1px solid #ccc",
+  outline: "none",
 };
 
-const saveBtn: React.CSSProperties = {
-  marginTop: 10,
-  padding: "10px 18px",
-  background: "#166534",
-  color: "white",
-  border: "none",
-  borderRadius: 8,
-  cursor: "pointer",
-};
-
-const uploadBtn: React.CSSProperties = {
-  marginLeft: 10,
-  padding: "8px 16px",
-  background: "#16a34a",
+const btn: React.CSSProperties = {
+  marginTop: 15,
+  padding: "10px 20px",
+  backgroundColor: "#166534",
   color: "white",
   border: "none",
   borderRadius: 8,
@@ -244,56 +406,67 @@ const uploadBtn: React.CSSProperties = {
 
 const photoGrid: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
+  gridTemplateColumns: "repeat(auto-fill,minmax(100px,1fr))",
   gap: 10,
   marginTop: 20,
 };
 
-const photoWrap: React.CSSProperties = {
-  position: "relative",
-};
-
 const photo: React.CSSProperties = {
   width: "100%",
-  borderRadius: 10,
-  objectFit: "cover",
   height: 100,
+  objectFit: "cover",
+  borderRadius: 8,
 };
 
-const deleteBtn: React.CSSProperties = {
-  position: "absolute",
-  top: 6,
-  right: 6,
-  background: "rgba(220,38,38,0.9)",
-  color: "white",
-  border: "none",
-  borderRadius: 6,
-  padding: "2px 6px",
-  fontSize: 12,
-  cursor: "pointer",
-};
-
-/* ✅ NEW: proper vertical spacing */
-const qrSection: React.CSSProperties = {
-  marginTop: 30,
+const radioContainer: React.CSSProperties = {
+  marginTop: 20,
   display: "flex",
   flexDirection: "column",
-  alignItems: "center",
-  gap: 12,
+  gap: 10,
 };
 
-const qrBtn: React.CSSProperties = {
-  padding: "12px 22px",
-  background: "#14532d",
-  color: "white",
-  border: "none",
-  borderRadius: 10,
+const radioRow: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
   cursor: "pointer",
 };
 
 const linkText: React.CSSProperties = {
+  display: "block",
+  marginTop: 20,
   color: "#166534",
   fontWeight: "bold",
   wordBreak: "break-all",
-  textDecoration: "none",
+};
+
+const overlay: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.4)",
+  zIndex: 998,
+};
+
+const sidebar: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: 260,
+  height: "100vh",
+  backgroundColor: "#111",
+  color: "white",
+  padding: 20,
+  zIndex: 999,
+  transition: "transform 0.3s ease",
+};
+
+const menuItem: React.CSSProperties = {
+  padding: "12px 10px",
+  marginTop: 10,
+  backgroundColor: "#1f1f1f",
+  borderRadius: 8,
+  cursor: "pointer",
 };

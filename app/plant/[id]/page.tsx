@@ -2,8 +2,17 @@ import { supabase } from "@/lib/supabase";
 import ShareButtons from "./ShareButtons";
 import MemorySlideshow from "@/components/MemorySlideshow";
 import MemoryModal from "@/components/MemoryModal";
+import AudioPlayer from "@/components/AudioPlayer";
 
 export const dynamic = "force-dynamic";
+
+type Plant = {
+  name: string;
+  message: string;
+  photos: string[];
+  audio_url?: string | null;
+  audio_mode?: "manual" | "auto" | null;
+};
 
 export default async function PlantPage({
   params,
@@ -12,11 +21,13 @@ export default async function PlantPage({
 }) {
   const { id } = await params;
 
-  const { data: plant, error } = await supabase
+  const { data, error } = await supabase
     .from("plants")
-    .select("name, message, photos")
+    .select("name, message, photos, audio_url, audio_mode")
     .eq("id", id)
     .maybeSingle();
+
+  const plant = data as Plant | null;
 
   if (!plant || error) {
     return (
@@ -33,12 +44,24 @@ export default async function PlantPage({
       {/* 🤍 MEMORY CARD FIRST */}
       <div style={card}>
         <h1 style={title}>{plant.name} 🌿</h1>
+       {plant.audio_url && plant.audio_mode === "manual" && (
+         <AudioPlayer
+           audioUrl={plant.audio_url}
+           audioMode="manual"
+         />
+       )}
 
         {plant.message && <p style={message}>{plant.message}</p>}
 
         {/* View Memories Button */}
         {plant.photos?.length > 0 && (
-          <MemoryModal photos={plant.photos} />
+          <MemoryModal
+            photos={plant.photos}
+            audioUrl={plant.audio_url || undefined}
+            audioMode={
+              plant.audio_mode === "auto" ? "auto" : "manual"
+            }
+          />
         )}
 
         <p style={footer}>

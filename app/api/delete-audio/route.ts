@@ -17,9 +17,9 @@ export async function POST(req: Request) {
       );
     }
 
-    /* ---------- Delete from Supabase Storage ---------- */
+    /* -------- Delete from Storage -------- */
     const { error: storageError } = await supabase.storage
-      .from("plant-photos")   // ⚠️ make sure bucket name matches yours
+      .from("plant-audio")
       .remove([fileName]);
 
     if (storageError) {
@@ -30,32 +30,17 @@ export async function POST(req: Request) {
       );
     }
 
-    /* ---------- Get Current Photos ---------- */
-    const { data: plant } = await supabase
+    /* -------- Remove from DB -------- */
+    const { error: dbError } = await supabase
       .from("plants")
-      .select("photos")
-      .eq("id", id)
-      .single();
-
-    if (!plant) {
-      return NextResponse.json(
-        { error: "Plant not found" },
-        { status: 404 }
-      );
-    }
-
-    const updatedPhotos = plant.photos.filter(
-      (url: string) => !url.includes(fileName)
-    );
-
-    /* ---------- Update DB ---------- */
-    const { error: updateError } = await supabase
-      .from("plants")
-      .update({ photos: updatedPhotos })
+      .update({
+        audio_url: null,
+        audio_mode: null,
+      })
       .eq("id", id);
 
-    if (updateError) {
-      console.error(updateError);
+    if (dbError) {
+      console.error(dbError);
       return NextResponse.json(
         { error: "DB update failed" },
         { status: 500 }
@@ -63,8 +48,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Server error" },
       { status: 500 }
