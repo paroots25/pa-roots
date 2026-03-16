@@ -52,7 +52,7 @@ export default function MemoryModal({
   );
 }
 
-/* ---------- Styles (UNCHANGED) ---------- */
+/* ---------- Styles ---------- */
 
 const viewButton: React.CSSProperties = {
   padding: "14px 28px",
@@ -65,22 +65,23 @@ const viewButton: React.CSSProperties = {
 
 const overlay: React.CSSProperties = {
   position: "fixed",
-  inset: 0,
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  background: "black",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  zIndex: 1000,
+  zIndex: 9999,
 };
 
 const modal: React.CSSProperties = {
-  width: "92%",
-  maxWidth: 1300,
-  height: "85vh",
+  width: "100vw",
+  height: "100vh",
   background: "black",
-  borderRadius: 20,
   display: "flex",
   flexDirection: "column",
-  overflow: "hidden",
 };
 
 const topBar: React.CSSProperties = {
@@ -88,7 +89,7 @@ const topBar: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "0 30px",
+  padding: "0 20px",
   background: "black",
 };
 
@@ -99,20 +100,21 @@ const topNote: React.CSSProperties = {
 };
 
 const closeBtn: React.CSSProperties = {
-  background: "rgba(255,255,255,0.15)",
+  background: "rgba(255,255,255,0.2)",
   border: "none",
   color: "white",
   fontSize: 20,
-  padding: "6px 12px",
-  borderRadius: 8,
+  padding: "8px 14px",
+  borderRadius: 10,
   cursor: "pointer",
 };
 
 const imageFrame: React.CSSProperties = {
   flex: 1,
+  width: "100%",
+  height: "100%",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  padding: "40px",
   background: "black",
 };
