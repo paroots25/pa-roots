@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       const fileName = `${id}-${Date.now()}.jpg`;
 
       const { data, error } = await supabase.storage
-        .from("plant-images")
+        .from("plant-photos")
         .upload(fileName, compressed, {
           contentType: "image/jpeg",
         });
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       }
 
       const { data: publicUrl } = supabase.storage
-        .from("plant-images")
+        .from("plant-photos")
         .getPublicUrl(fileName);
 
       uploadedUrls.push(publicUrl.publicUrl);
