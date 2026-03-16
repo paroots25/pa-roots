@@ -61,3 +61,99 @@ html {
   opacity: 1;
   transform: translateY(0);
 }
+
+@keyframes timeMove {
+  0% {
+    transform: translateX(100vw);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-100vw);
+    opacity: 0;
+  }
+}
+
+/* ---------- LOVE HEART FLOAT ---------- */
+
+.loveHearts {
+  position: absolute;
+  font-size: 20px;
+  animation: floatHeart 4s linear infinite;
+}
+
+@keyframes floatHeart {
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-120px);
+    opacity: 0;
+  }
+}
+
+/* ---------- BIRTHDAY CAKE ---------- */
+
+@keyframes cakePop {
+  0% {
+    transform: scale(0);
+  }
+
+  70% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.birthdayCake {
+  animation: cakePop 1.5s ease;
+}
+
+/* ---------- STAR SPARKLE ---------- */
+
+.star {
+  position: absolute;
+  font-size: 14px;
+  animation: starTwinkle 2s infinite alternate;
+}
+
+@keyframes starTwinkle {
+  from {
+    opacity: 0.3;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- FLOWER BLOOM ---------- */
+
+@keyframes bloom {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.flower {
+  animation: bloom 2s ease forwards;
+}

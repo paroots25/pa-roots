@@ -15,12 +15,18 @@ export default function DashboardPage() {
   const [audioUrl, setAudioUrl] = useState("");
   const [audioMode, setAudioMode] = useState<"manual" | "auto">("manual");
 
+  /* NEW */
+  const [animationType, setAnimationType] = useState<
+    "none" | "love" | "birthday" | "sister" | "brother" | "mother" | "father"
+  >("none");
+
   const [memoryLink, setMemoryLink] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [activeTab, setActiveTab] = useState<
-    "message" | "images" | "audio" | "qr"
+    "message" | "images" | "audio" | "animations" | "qr"
   >("message");
 
   /* ---------------- LOAD PLANT ---------------- */
@@ -34,6 +40,9 @@ export default function DashboardPage() {
         setPhotos(data.plant.photos || []);
         setAudioUrl(data.plant.audio_url || "");
         setAudioMode(data.plant.audio_mode || "manual");
+
+        /* NEW */
+        setAnimationType(data.plant.animation_type || "none");
       }
     }
 
@@ -63,6 +72,23 @@ export default function DashboardPage() {
     alert("Memory saved 🌱");
   }
 
+  /* ---------------- SAVE ANIMATION ---------------- */
+  async function handleSaveAnimation() {
+    setLoading(true);
+
+    await fetch("/api/update-plant", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        animation_type: animationType,
+      }),
+    });
+
+    setLoading(false);
+    alert("Animation saved 🎬");
+  }
+
   /* ---------------- UPLOAD PHOTOS ---------------- */
   async function handleUploadPhotos() {
     if (!files) return;
@@ -86,7 +112,7 @@ export default function DashboardPage() {
     setLoading(false);
   }
 
-  /* ---------------- DELETE PHOTO (NEW) ---------------- */
+  /* ---------------- DELETE PHOTO ---------------- */
   async function handleDeletePhoto(photoUrl: string) {
     if (!confirm("Delete this photo?")) return;
 
@@ -165,6 +191,7 @@ export default function DashboardPage() {
   }
 
   /* ---------------- UI ---------------- */
+
   return (
     <div style={page}>
       <div style={topBar}>
@@ -176,6 +203,7 @@ export default function DashboardPage() {
 
       <div style={contentWrapper}>
         <div style={card}>
+
           {activeTab === "message" && (
             <>
               <textarea
@@ -198,6 +226,7 @@ export default function DashboardPage() {
                 accept="image/*"
                 onChange={(e) => setFiles(e.target.files)}
               />
+
               <button style={btn} onClick={handleUploadPhotos}>
                 Upload Photos
               </button>
@@ -206,6 +235,7 @@ export default function DashboardPage() {
                 {photos.map((url, i) => (
                   <div key={i} style={{ position: "relative" }}>
                     <img src={url} style={photo} />
+
                     <button
                       onClick={() => handleDeletePhoto(url)}
                       style={{
@@ -219,9 +249,6 @@ export default function DashboardPage() {
                         width: 24,
                         height: 24,
                         cursor: "pointer",
-                        fontSize: 14,
-                        lineHeight: "24px",
-                        textAlign: "center",
                       }}
                     >
                       ✕
@@ -289,6 +316,83 @@ export default function DashboardPage() {
             </>
           )}
 
+          {/* NEW ANIMATION TAB */}
+
+          {activeTab === "animations" && (
+            <>
+              <div style={radioContainer}>
+
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={animationType === "none"}
+                    onChange={() => setAnimationType("none")}
+                  />
+                  No Animation
+                </label>
+
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={animationType === "love"}
+                    onChange={() => setAnimationType("love")}
+                  />
+                  Love Story 💖
+                </label>
+
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={animationType === "birthday"}
+                    onChange={() => setAnimationType("birthday")}
+                  />
+                  Birthday 🎂
+                </label>
+
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={animationType === "sister"}
+                    onChange={() => setAnimationType("sister")}
+                  />
+                  Sister 💜
+                </label>
+
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={animationType === "brother"}
+                    onChange={() => setAnimationType("brother")}
+                  />
+                  Brother 💙
+                </label>
+
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={animationType === "mother"}
+                    onChange={() => setAnimationType("mother")}
+                  />
+                  Mother's Day 🌸
+                </label>
+
+                <label style={radioRow}>
+                  <input
+                    type="radio"
+                    checked={animationType === "father"}
+                    onChange={() => setAnimationType("father")}
+                  />
+                  Father's Day 🌳
+                </label>
+
+              </div>
+
+              <button style={btn} onClick={handleSaveAnimation}>
+                Save Animation 🎬
+              </button>
+            </>
+          )}
+
           {activeTab === "qr" && (
             <>
               <button
@@ -308,6 +412,7 @@ export default function DashboardPage() {
               </a>
             </>
           )}
+
         </div>
       </div>
 
@@ -337,6 +442,10 @@ export default function DashboardPage() {
           🎵 Audio
         </div>
 
+        <div style={menuItem} onClick={() => { setActiveTab("animations"); setSidebarOpen(false); }}>
+          🎬 Animations
+        </div>
+
         <div style={menuItem} onClick={() => { setActiveTab("qr"); setSidebarOpen(false); }}>
           🔗 QR & Link
         </div>
@@ -344,7 +453,6 @@ export default function DashboardPage() {
     </div>
   );
 }
-
 /* ---------------- STYLES ---------------- */
 
 const page: React.CSSProperties = {
