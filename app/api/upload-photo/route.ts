@@ -2,7 +2,6 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import sharp from "sharp";
 
 export async function POST(req: Request) {
   try {
@@ -27,21 +26,15 @@ export async function POST(req: Request) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
-      /* Compress image */
-
-      const compressed = await sharp(buffer)
-        .resize({ width: 1600 }) 
-        .jpeg({ quality: 70 })
-        .toBuffer();
-
-      const fileName = `${id}-${Date.now()}.jpg`;
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${id}-${Date.now()}.${fileExt}`;
 
       /* Upload to Supabase */
 
       const { error } = await supabase.storage
         .from("plant-photos")
-        .upload(fileName, compressed, {
-          contentType: "image/jpeg",
+        .upload(fileName, buffer, {
+          contentType: file.type,
         });
 
       if (error) {
