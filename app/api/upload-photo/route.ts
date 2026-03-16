@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import sharp from "sharp";
@@ -10,61 +12,86 @@ export async function POST(req: Request) {
     const files = formData.getAll("files") as File[];
 
     if (!id) {
-      return NextResponse.json({ error: "Missing plant id" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing plant id" },
+        { status: 400 }
+      );
     }
 
     const uploadedUrls: string[] = [];
 
     for (const file of files) {
 
+      /* Convert file to buffer */
+
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
-      /* 🔥 IMAGE COMPRESSION */
+      /* Compress image */
 
       const compressed = await sharp(buffer)
-        .resize({ width: 1600 }) // limit width
-        .jpeg({ quality: 70 })   // compression quality
+        .resize({ width: 1600 }) 
+        .jpeg({ quality: 70 })
         .toBuffer();
 
       const fileName = `${id}-${Date.now()}.jpg`;
 
-      const { data, error } = await supabase.storage
+      /* Upload to Supabase */
+
+      const { error } = await supabase.storage
         .from("plant-photos")
         .upload(fileName, compressed, {
           contentType: "image/jpeg",
         });
 
       if (error) {
-        console.error(error);
+        console.error("Upload error:", error);
         continue;
       }
 
-      const { data: publicUrl } = supabase.storage
+      /* Get public URL */
+
+      const { data } = supabase.storage
         .from("plant-photos")
         .getPublicUrl(fileName);
 
-      uploadedUrls.push(publicUrl.publicUrl);
+      uploadedUrls.push(data.publicUrl);
     }
 
-    /* GET OLD PHOTOS */
+    /* Get existing photos */
 
-    const { data: plant } = await supabase
+    const { data: plant, error: fetchError } = await supabase
       .from("plants")
       .select("photos")
       .eq("id", id)
       .single();
 
+    if (fetchError) {
+      console.error(fetchError);
+      return NextResponse.json(
+        { error: "Failed to fetch plant" },
+        { status: 500 }
+      );
+    }
+
     const existingPhotos = plant?.photos || [];
 
     const updatedPhotos = [...existingPhotos, ...uploadedUrls];
 
-    /* UPDATE DATABASE */
+    /* Update database */
 
-    await supabase
+    const { error: updateError } = await supabase
       .from("plants")
       .update({ photos: updatedPhotos })
       .eq("id", id);
+
+    if (updateError) {
+      console.error(updateError);
+      return NextResponse.json(
+        { error: "Failed to update photos" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -73,12 +100,11 @@ export async function POST(req: Request) {
 
   } catch (err) {
 
-    console.error(err);
+    console.error("Upload failed:", err);
 
     return NextResponse.json(
       { error: "Upload failed" },
       { status: 500 }
     );
-
   }
 }
