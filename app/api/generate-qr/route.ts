@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { supabase } from "@/lib/supabase";
 
 export async function POST(req: Request) {
